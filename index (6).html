@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0c0a08">
+<title>Ember Trading — Académie Interactive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0a08;
+    --bg-panel:#16110d;
+    --bg-panel-2:#1f1712;
+    --line:#2c241c;
+    --ember-1:#ff4d1f;
+    --ember-2:#ff8a1e;
+    --ember-3:#ffc24b;
+    --text-hi:#f8efe4;
+    --text-mid:#c7b8a8;
+    --text-low:#8a7a6a;
+    --candle-up:#36c98e;
+    --candle-down:#ef4b4b;
+    --ok:#36c98e;
+    --bad:#ef4b4b;
+    --radius:14px;
+    --font-display:"Oswald","Arial Narrow",sans-serif;
+    --font-body:"Inter",-apple-system,"Segoe UI",sans-serif;
+    --font-mono:"JetBrains Mono","Consolas",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{min-height:100%;}
+  body{
+    background:var(--bg);
+    color:var(--text-hi);
+    font-family:var(--font-body);
+    line-height:1.55;
+    position:relative;
+    overflow-x:hidden;
+  }
+  
+   to{ background-position:center top, -240px 60%; } }
+  @media (prefers-reduced-motion: reduce){ body::before{ animation:none; } *{ transition:none !important; animation:none !important; } }
+
+  #app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;}
+
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+  input{font-family:inherit;}
+  :focus-visible{outline:2px solid var(--ember-3);outline-offset:2px;}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:13px 26px;border-radius:10px;
+    font-family:var(--font-display);font-weight:600;font-size:15px;letter-spacing:0.02em;
+    transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+  }
+  .btn-primary{
+    background:linear-gradient(135deg, var(--ember-1), var(--ember-2));
+    color:#1a0d04;
+    box-shadow:0 6px 24px rgba(255,90,20,0.35);
+  }
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(255,90,20,0.45);}
+  .btn-primary:active{transform:translateY(0);}
+  .btn-secondary{background:var(--bg-panel-2);border:1px solid var(--line);color:var(--text-hi);}
+  .btn-secondary:hover{border-color:var(--ember-2);}
+
+  .link-back{font-family:var(--font-mono);font-size:13px;color:var(--text-low);padding:6px 0;}
+  .link-back:hover{color:var(--ember-3);}
+
+  .gate-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .gate-card{
+    width:100%;max-width:420px;text-align:center;
+    background:var(--bg-panel);border:1px solid var(--line);border-radius:18px;
+    padding:42px 30px 36px;
+  }
+  .gate-card.shake{animation:shake .4s ease;}
+  @keyframes shake{ 10%,90%{transform:translateX(-2px);} 20%,80%{transform:translateX(4px);} 30%,50%,70%{transform:translateX(-8px);} 40%,60%{transform:translateX(8px);} }
+  .gate-mark{width:48px;height:48px;margin:0 auto 18px;color:var(--ember-2);}
+  .gate-mark svg{width:100%;height:100%;}
+  .gate-title{font-family:var(--font-display);font-weight:700;font-size:26px;letter-spacing:0.08em;}
+  .gate-sub{font-family:var(--font-mono);font-size:12px;letter-spacing:0.15em;color:var(--ember-3);text-transform:uppercase;margin-top:4px;}
+  .gate-desc{color:var(--text-mid);font-size:14.5px;margin:18px 0 22px;}
+  .gate-form{display:flex;flex-direction:column;gap:12px;}
+  .gate-input{
+    width:100%;padding:14px 16px;border-radius:10px;
+    background:var(--bg-panel-2);border:1px solid var(--line);color:var(--text-hi);
+    font-family:var(--font-mono);font-size:16px;letter-spacing:0.05em;text-align:center;text-transform:uppercase;
+  }
+  .gate-input:focus{border-color:var(--ember-2);}
+  .gate-error{color:var(--bad);font-size:13.5px;margin-top:14px;}
+  .gate-footer{color:var(--text-low);font-size:13px;margin-top:22px;}
+  .gate-footer a{color:var(--ember-3);}
+  .gate-social{display:flex;justify-content:center;gap:14px;margin-top:16px;}
+  .gate-social-btn{
+    width:42px;height:42px;border-radius:50%;
+    background:var(--bg-panel-2);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--text-low);transition:border-color .15s ease, color .15s ease, transform .15s ease;
+    text-decoration:none;
+  }
+  .gate-social-btn svg{width:19px;height:19px;}
+  .gate-social-btn:hover{border-color:var(--ember-2);color:var(--ember-3);transform:translateY(-2px);}
+
+  .dashboard{flex:1;max-width:640px;width:100%;margin:0 auto;padding:32px 20px 60px;}
+  .dash-header{display:flex;align-items:center;gap:14px;margin-bottom:6px;}
+  .dash-mark{width:34px;height:34px;color:var(--ember-2);flex-shrink:0;}
+  .dash-mark svg{width:100%;height:100%;}
+  .dash-titles .dash-brand{font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:0.06em;}
+  .dash-titles .dash-sub{font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;color:var(--text-low);text-transform:uppercase;}
+  .dash-progress{margin:22px 0 30px;}
+  .dash-progress-label{font-family:var(--font-mono);font-size:12.5px;color:var(--text-mid);margin-bottom:8px;display:flex;justify-content:space-between;}
+  .dash-progress-track{height:6px;border-radius:6px;background:var(--bg-panel-2);overflow:hidden;}
+  .dash-progress-fill{height:100%;background:linear-gradient(90deg,var(--ember-1),var(--ember-3));border-radius:6px;transition:width .4s ease;}
+
+  .path-list{position:relative;padding-left:46px;}
+  .path-line{position:absolute;left:27px;top:28px;bottom:28px;width:2px;background:var(--line);border-radius:2px;}
+  .path-line-fill{position:absolute;left:0;top:0;width:100%;background:linear-gradient(180deg,var(--ember-1),var(--ember-3));border-radius:2px;transition:height .4s ease;}
+  .node{position:relative;display:flex;gap:18px;align-items:flex-start;padding:16px 0;}
+  .node-circle{
+    position:relative;flex-shrink:0;width:56px;height:56px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--bg-panel-2);border:2px solid var(--line);
+    margin-left:-1px;transition:transform .15s ease;
+  }
+  .node-circle svg{width:24px;height:24px;}
+  .node.locked .node-circle{opacity:0.5;color:var(--text-low);}
+  .node.unlocked .node-circle{border-color:var(--ember-2);color:var(--ember-3);box-shadow:0 0 0 4px rgba(255,138,30,0.12), 0 0 18px rgba(255,90,20,0.25);}
+  .node.completed .node-circle{background:linear-gradient(135deg,var(--ember-1),var(--ember-2));border-color:transparent;color:#1a0d04;}
+  .node-badge{position:absolute;bottom:-3px;right:-3px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--bg);border:2px solid var(--bg);}
+  .node-badge svg{width:11px;height:11px;}
+  .node.locked .node-badge{color:var(--text-low);background:var(--bg-panel-2);}
+  .node.completed .node-badge{color:var(--ok);background:var(--bg-panel);}
+  .node-info{flex:1;padding-top:6px;}
+  .node-title{font-family:var(--font-display);font-weight:600;font-size:16.5px;}
+  .node.locked .node-title{color:var(--text-low);}
+  .node-tag{font-size:13px;color:var(--text-mid);margin-top:3px;}
+  .node.locked .node-tag{color:var(--text-low);}
+  .node-status{display:inline-block;margin-top:7px;font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;padding:3px 9px;border-radius:20px;}
+  .node.unlocked .node-status{background:rgba(255,138,30,0.15);color:var(--ember-3);}
+  .node.completed .node-status{background:rgba(54,201,142,0.15);color:var(--ok);}
+  .node-clickable{cursor:pointer;}
+  .node-clickable:hover .node-circle{transform:scale(1.05);}
+
+  .dash-footer{margin-top:40px;text-align:center;}
+  .dash-tagline{font-family:var(--font-mono);font-size:11.5px;color:var(--text-low);letter-spacing:0.1em;text-transform:uppercase;}
+  .dash-reset{margin-top:16px;font-size:12.5px;color:var(--text-low);text-decoration:underline;}
+  .dash-reset:hover{color:var(--bad);}
+
+  .screen{flex:1;max-width:640px;width:100%;margin:0 auto;padding:24px 20px 60px;}
+  .screen-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+  .screen-tag{font-family:var(--font-mono);font-size:12px;color:var(--ember-3);letter-spacing:0.08em;text-transform:uppercase;}
+
+  .lesson-card{background:var(--bg-panel);border:1px solid var(--line);border-radius:var(--radius);padding:28px 26px;}
+  .lesson-heading{font-family:var(--font-display);font-weight:600;font-size:21px;margin-bottom:12px;}
+  .lesson-body p{color:var(--text-mid);font-size:15px;margin-bottom:12px;}
+  .lesson-body p:last-child{margin-bottom:0;}
+  .lesson-callout{margin-top:16px;padding:14px 16px;border-radius:10px;background:rgba(255,138,30,0.08);border-left:3px solid var(--ember-2);color:var(--text-hi);font-size:14px;}
+  .table-wrap{overflow-x:auto;margin:16px 0;}
+  .lesson-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  .lesson-table th{font-family:var(--font-mono);font-size:11.5px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ember-3);text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap;}
+  .lesson-table td{padding:10px;border-bottom:1px solid var(--line);color:var(--text-mid);}
+  .candle-diagram{width:100%;max-width:340px;height:auto;display:block;margin:16px auto 6px;}
+  .dg-label{font-family:var(--font-mono);font-size:11px;fill:var(--text-low);}
+  .dg-strong{fill:var(--text-hi);font-weight:600;font-size:12px;}
+  .lesson-progress{display:flex;gap:6px;margin-bottom:18px;}
+  .lesson-dot{height:4px;flex:1;border-radius:4px;background:var(--line);}
+  .lesson-dot.done{background:var(--ember-2);}
+  .lesson-nav{display:flex;justify-content:space-between;gap:10px;margin-top:24px;}
+
+  .quiz-card,.quiz-result-card{background:var(--bg-panel);border:1px solid var(--line);border-radius:var(--radius);padding:28px 26px;}
+  .quiz-question{font-family:var(--font-display);font-weight:600;font-size:19px;margin-bottom:18px;}
+  .quiz-options{display:flex;flex-direction:column;gap:10px;}
+  .quiz-option{
+    text-align:left;padding:14px 16px;border-radius:10px;
+    background:var(--bg-panel-2);border:1px solid var(--line);color:var(--text-hi);font-size:14.5px;
+    transition:border-color .15s ease;
+  }
+  .quiz-option:not(:disabled):hover{border-color:var(--ember-2);}
+  .quiz-option.correct{border-color:var(--ok);background:rgba(54,201,142,0.12);}
+  .quiz-option.incorrect{border-color:var(--bad);background:rgba(239,75,75,0.12);}
+  .quiz-option:disabled{cursor:default;}
+  .quiz-explain{margin-top:16px;font-size:14px;color:var(--text-mid);padding:12px 14px;background:var(--bg-panel-2);border-radius:10px;}
+  .quiz-actions{margin-top:20px;}
+  .quiz-result-card{text-align:center;}
+  .quiz-result-title{font-family:var(--font-display);font-size:22px;font-weight:700;margin-bottom:10px;}
+  .quiz-result-score{font-family:var(--font-mono);font-size:28px;color:var(--ember-3);margin-bottom:10px;}
+  .quiz-result-msg{color:var(--text-mid);font-size:14.5px;margin-bottom:22px;}
+
+  .exercise-card{background:var(--bg-panel);border:1px solid var(--line);border-radius:var(--radius);padding:26px;}
+  .exercise-instruction{font-size:15px;color:var(--text-hi);margin-bottom:16px;}
+  .chart-wrap{background:var(--bg-panel-2);border:1px solid var(--line);border-radius:10px;padding:10px;cursor:crosshair;}
+  .chart-wrap canvas{display:block;width:100%;}
+  .exercise-feedback{margin-top:16px;padding:12px 14px;border-radius:10px;font-size:14px;}
+  .exercise-feedback.ok{background:rgba(54,201,142,0.12);color:var(--ok);border:1px solid rgba(54,201,142,0.3);}
+  .exercise-feedback.bad{background:rgba(239,75,75,0.1);color:#ff9d9d;border:1px solid rgba(239,75,75,0.25);}
+  .exercise-actions{margin-top:18px;}
+
+  .calc-given{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;padding:14px;background:var(--bg-panel-2);border-radius:10px;border:1px solid var(--line);}
+  .calc-row{display:flex;justify-content:space-between;align-items:center;font-size:14px;}
+  .calc-label{color:var(--text-mid);}
+  .calc-value{font-family:var(--font-mono);color:var(--ember-3);font-size:15px;}
+  .calc-input-row{display:flex;gap:8px;align-items:center;margin-top:8px;}
+  .calc-input{flex:1;padding:12px 14px;border-radius:10px;background:var(--bg-panel-2);border:1px solid var(--line);color:var(--text-hi);font-family:var(--font-mono);font-size:18px;}
+  .calc-input:focus{border-color:var(--ember-2);}
+  .calc-unit{font-family:var(--font-mono);font-size:13px;color:var(--text-mid);white-space:nowrap;}
+
+  .cert-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;flex-direction:column;gap:20px;}
+  .cert-input-area{width:100%;max-width:540px;background:var(--bg-panel);border:1px solid var(--line);border-radius:var(--radius);padding:28px 24px;text-align:center;}
+  .cert-input-title{font-family:var(--font-display);font-size:17px;font-weight:600;color:var(--ember-3);margin-bottom:6px;}
+  .cert-input-sub{color:var(--text-mid);font-size:13.5px;margin-bottom:18px;}
+  .cert-name-row{display:flex;gap:8px;}
+  .cert-name-input{flex:1;padding:13px 14px;border-radius:10px;background:var(--bg-panel-2);border:1px solid var(--line);color:var(--text-hi);font-family:var(--font-body);font-size:15px;}
+  .cert-name-input:focus{border-color:var(--ember-2);}
+
+  /* ---- CERTIFICATE DOCUMENT ---- */
+  .cert-doc{
+    width:100%;max-width:640px;
+    background:linear-gradient(160deg,#1a1108 0%,#120d06 50%,#1a1108 100%);
+    border:1px solid #3a2a15;
+    border-radius:4px;
+    padding:0;
+    overflow:hidden;
+    position:relative;
+    box-shadow:0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,178,60,0.15);
+  }
+  .cert-outer-border{
+    margin:10px;
+    border:1px solid rgba(255,178,60,0.3);
+    border-radius:2px;
+    padding:32px 28px 28px;
+    position:relative;
+  }
+  /* Corner ornaments */
+  .cert-outer-border::before,.cert-outer-border::after{
+    content:"";position:absolute;width:22px;height:22px;
+    border-color:var(--ember-3);border-style:solid;opacity:0.6;
+  }
+  .cert-outer-border::before{top:-1px;left:-1px;border-width:2px 0 0 2px;}
+  .cert-outer-border::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0;}
+  .cert-inner-border{
+    border:1px solid rgba(255,138,30,0.15);
+    border-radius:2px;
+    padding:28px 24px 24px;
+    position:relative;
+  }
+  .cert-inner-border::before,.cert-inner-border::after{
+    content:"";position:absolute;width:14px;height:14px;
+    border-color:rgba(255,178,60,0.4);border-style:solid;
+  }
+  .cert-inner-border::before{top:-1px;right:-1px;border-width:2px 2px 0 0;}
+  .cert-inner-border::after{bottom:-1px;left:-1px;border-width:0 0 2px 2px;}
+
+  /* Header */
+  .cert-header{text-align:center;margin-bottom:22px;}
+  .cert-logo-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:4px;}
+  .cert-logo-icon{width:28px;height:28px;color:var(--ember-2);}
+  .cert-logo-icon svg{width:100%;height:100%;}
+  .cert-org{font-family:var(--font-display);font-size:13px;letter-spacing:0.25em;color:var(--ember-3);text-transform:uppercase;}
+  .cert-divider{display:flex;align-items:center;gap:10px;margin:10px 0;}
+  .cert-divider-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(255,178,60,0.4),transparent);}
+  .cert-divider-diamond{width:6px;height:6px;background:var(--ember-3);transform:rotate(45deg);flex-shrink:0;opacity:0.7;}
+
+  /* Main title */
+  .cert-main-title{font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:0.12em;text-align:center;color:var(--text-hi);text-transform:uppercase;margin-bottom:4px;}
+  .cert-subtitle{font-family:var(--font-mono);font-size:10px;letter-spacing:0.2em;color:var(--ember-3);text-align:center;text-transform:uppercase;margin-bottom:20px;}
+
+  /* Body text */
+  .cert-body-text{text-align:center;color:var(--text-mid);font-size:13px;font-style:italic;margin-bottom:14px;line-height:1.7;}
+  .cert-recipient-name{
+    font-family:var(--font-display);font-size:30px;font-weight:600;
+    text-align:center;color:var(--ember-3);
+    margin:0 auto 4px;
+    letter-spacing:0.04em;
+    text-shadow:0 0 30px rgba(255,138,30,0.3);
+    border-bottom:1px solid rgba(255,178,60,0.3);
+    padding-bottom:8px;
+    max-width:90%;
+  }
+  .cert-completion-text{text-align:center;color:var(--text-mid);font-size:13px;margin:14px 0 6px;line-height:1.7;}
+  .cert-formation-name{font-family:var(--font-display);font-size:16px;font-weight:600;letter-spacing:0.08em;color:var(--text-hi);text-align:center;margin-bottom:4px;}
+  .cert-formation-sub{font-family:var(--font-mono);font-size:10.5px;color:var(--text-low);letter-spacing:0.1em;text-align:center;margin-bottom:20px;}
+
+  /* Footer row */
+  .cert-footer-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:18px;gap:12px;}
+  .cert-sig-block{text-align:center;flex:1;}
+  .cert-sig-line{width:100%;height:1px;background:rgba(255,255,255,0.15);margin-bottom:6px;}
+  .cert-sig-name{font-family:var(--font-display);font-size:13px;letter-spacing:0.05em;color:var(--text-hi);}
+  .cert-sig-role{font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.1em;color:var(--text-low);text-transform:uppercase;margin-top:2px;}
+
+  /* Wax seal */
+  .cert-seal{flex-shrink:0;width:72px;height:72px;position:relative;}
+  .cert-seal-svg{width:72px;height:72px;}
+
+  /* Date */
+  .cert-date-block{text-align:center;flex:1;}
+  .cert-date-val{font-family:var(--font-mono);font-size:11px;color:var(--text-mid);letter-spacing:0.06em;}
+  .cert-date-label{font-family:var(--font-mono);font-size:9px;letter-spacing:0.12em;color:var(--text-low);text-transform:uppercase;margin-top:3px;}
+
+  /* Background watermark */
+  .cert-watermark{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    opacity:0.03;pointer-events:none;
+    width:220px;height:220px;color:var(--ember-2);
+  }
+  .cert-watermark svg{width:100%;height:100%;}
+
+  @media(max-width:520px){
+    .cert-main-title{font-size:20px;}
+    .cert-recipient-name{font-size:22px;}
+    .cert-outer-border{padding:20px 16px 18px;}
+    .cert-inner-border{padding:18px 14px 16px;}
+  }
+
+  .complete-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .complete-card{max-width:420px;width:100%;text-align:center;background:var(--bg-panel);border:1px solid var(--line);border-radius:18px;padding:40px 30px;}
+  .complete-icon{width:46px;height:46px;margin:0 auto 16px;color:var(--ember-2);}
+  .complete-icon svg{width:100%;height:100%;}
+  .complete-title{font-family:var(--font-display);font-size:23px;font-weight:700;}
+  .complete-sub{color:var(--text-mid);margin-top:6px;font-size:14.5px;}
+  .complete-next{margin:18px 0 24px;font-size:14.5px;color:var(--text-hi);}
+
+  @media (max-width:480px){
+    .lesson-card,.quiz-card,.quiz-result-card,.exercise-card{padding:20px 18px;}
+    .gate-card{padding:32px 22px 28px;}
+  }
+
+  /* ── FOND ANIMÉ ────────────────────────────────────────── */
+  #gameBg {
+    position: fixed;
+    inset: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+  #app { position: relative; z-index: 1; }
+
+  .disclaimer-banner {
+    background: rgba(11,9,6,0.7);
+    border-top: 1px solid rgba(255,178,60,0.15);
+    padding: 12px 20px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-low);
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+</style>
+</head>
+<body>
+<canvas id="gameBg" aria-hidden="true"></canvas>
+<div id="app"></div>
+<div class="disclaimer-banner" id="gameDisclaimer" style="position:relative;z-index:2;">Cette formation est fournie à titre éducatif uniquement et ne constitue pas un conseil financier ni une recommandation d’investissement. Le trading comporte des risques significatifs de perte en capital. Tradez uniquement avec des fonds que vous pouvez vous permettre de perdre.</div>
+<noscript>
+  <div style="background:#1a0d04;color:#ffc24b;padding:24px;text-align:center;font-family:sans-serif;">
+    Ce jeu a besoin que JavaScript soit activé dans ton navigateur pour fonctionner.<br>
+    Active JavaScript, ou essaie de l'ouvrir avec Chrome, Safari ou Firefox.
+  </div>
+</noscript>
+<script>
+/* EMBER TRADING - ACADEMIE INTERACTIVE - v1 */
+function hashCode(str){
+  str = String(str).toUpperCase().replace(/[^A-Z0-9]/g, "");
+  var hash = 5381;
+  for (var i=0;i<str.length;i++){
+    hash = ((hash << 5) + hash) + str.charCodeAt(i);
+    hash = hash & hash;
+  }
+  return (hash >>> 0).toString(36);
+}
+window.hashCode = hashCode;
+
+var ACCESS_HASHES = ["1p5okoc","ybukv0","xanu3q","2hl8g1","179a01o","xzis1z","ushmnk","xpw0pi","146pr4d","13d6bw6","8numea","1t2hz8q","1y499mf","fpuk9k","lmp6ny","1lxqmcw","1yui82o","1u3p4mj","8e34m8","1qpapiw","6f60on","190gyov","dru3ds","18y7qv7","hc8cny"];
+
+var ICONS = {
+  flame: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 C12 2 7 8 7 13.5 C7 18 9.2 21 12 21 C14.8 21 17 18 17 13.5 C17 8 12 2 12 2 Z"/></svg>',
+  candle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="8"/><rect x="8" y="8" width="8" height="9"/><line x1="12" y1="17" x2="12" y2="22"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>',
+  trend: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,18 9,11 13,14 21,4"/><polyline points="15,4 21,4 21,10"/></svg>',
+  steps: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="16" width="5" height="5"/><rect x="9.5" y="10" width="5" height="11"/><rect x="16" y="4" width="5" height="17"/></svg>',
+  target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg>',
+  shield: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 L20 5.5 V11.5 C20 17 16.5 20.5 12 22 C7.5 20.5 4 17 4 11.5 V5.5 Z"/></svg>',
+  bank: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,9 12,3 21,9"/><line x1="4" y1="9" x2="20" y2="9"/><line x1="6" y1="9" x2="6" y2="18"/><line x1="12" y1="9" x2="12" y2="18"/><line x1="18" y1="9" x2="18" y2="18"/><line x1="4" y1="20" x2="20" y2="20"/></svg>',
+  lock: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,12 9,17 20,6"/></svg>'
+};
+
+var CANDLE_DIAGRAM_SVG = '<svg viewBox="0 0 390 210" class="candle-diagram" role="img" aria-label="Anatomie de la bougie">' +
+  '<line x1="10" y1="195" x2="380" y2="195" stroke="var(--line)" stroke-width="1"/>' +
+  '<line x1="90" y1="20" x2="90" y2="180" stroke="var(--candle-up)" stroke-width="2"/>' +
+  '<rect x="70" y="60" width="40" height="70" fill="var(--candle-up)" rx="2"/>' +
+  '<text x="90" y="208" text-anchor="middle" class="dg-label dg-strong">Haussière</text>' +
+  '<line x1="90" y1="20" x2="50" y2="20" stroke="var(--text-low)" stroke-width="1" stroke-dasharray="2,2"/>' +
+  '<text x="8" y="24" class="dg-label">High</text>' +
+  '<line x1="90" y1="180" x2="50" y2="180" stroke="var(--text-low)" stroke-width="1" stroke-dasharray="2,2"/>' +
+  '<text x="8" y="184" class="dg-label">Low</text>' +
+  '<line x1="230" y1="20" x2="230" y2="180" stroke="var(--candle-down)" stroke-width="2"/>' +
+  '<rect x="210" y="60" width="40" height="70" fill="var(--candle-down)" rx="2"/>' +
+  '<text x="230" y="208" text-anchor="middle" class="dg-label dg-strong">Baissière</text>' +
+  '<line x1="252" y1="60" x2="270" y2="60" stroke="var(--text-low)" stroke-width="1" stroke-dasharray="2,2"/>' +
+  '<text x="275" y="64" class="dg-label">Close (fermeture)</text>' +
+  '<line x1="252" y1="130" x2="270" y2="130" stroke="var(--text-low)" stroke-width="1" stroke-dasharray="2,2"/>' +
+  '<text x="275" y="134" class="dg-label">Open (ouverture)</text>' +
+  '</svg>';
+
+var MODULE_META = [
+  {id:1, title:"Les Fondations", tagline:"Marchés, bougies, levier et styles de trading", icon:"candle"},
+  {id:2, title:"Sessions et Contexte Macro", tagline:"Heures de marché et forces qui bougent les prix", icon:"clock"},
+  {id:3, title:"Support, Résistance et Tendance", tagline:"Le sol, le plafond, et la ligne qui donne la direction", icon:"trend"},
+  {id:4, title:"Structure de Marché", tagline:"Swing high/low, accumulation, et l'analyse top-down", icon:"steps"},
+  {id:5, title:"Smart Money Concepts", tagline:"Flags, FVG, Order Blocks et zones de liquidité", icon:"target"},
+  {id:6, title:"Psychologie et Gestion du Risque", tagline:"Le 1-2%, les erreurs fatales, et le mental de fer", icon:"shield"},
+  {id:7, title:"Prop Firm et Capital Réel", tagline:"Drawdown, règle de consistance, et le grand saut", icon:"bank"},
+  {id:8, title:"Examen Final", tagline:"Tout ce que tu as appris, sur un seul graphique", icon:"flame"}
+];
+
+var PLACEHOLDER_CONTENT = {
+  lesson:[{type:"text", heading:"Bientôt disponible", body:"Ce module est encore en construction. Reviens un peu plus tard !"}],
+  quiz:[],
+  exercise:null
+};
+
+var MODULE_CONTENT = {};
+
+MODULE_CONTENT[1] = {
+  lesson: [
+    {
+      type:"text",
+      heading:"Les marchés que tu vas trader",
+      body:"Le Forex, c'est le marché des devises : tu achètes une monnaie en vendant une autre, comme l'EUR/USD. Il est ouvert 24 heures sur 24 du dimanche soir au vendredi soir, mais toutes les heures ne se valent pas, on y revient dans le prochain module.\n\nLes cryptomonnaies fonctionnent un peu pareil, mais elles ne dorment jamais : 24 heures sur 24, 7 jours sur 7. Plus de mouvement, mais aussi plus de chaos.\n\nLes commodités sont des matières premières comme l'or (symbole XAUUSD) ou le pétrole. L'or est ton terrain de jeu principal dans cette formation, il réagit aux mêmes structures de prix que le forex, mais avec plus de caractère.\n\nLes futures sont des contrats à terme surtout utilisés par les institutions et les traders avancés. Retiens l'essentiel : peu importe le marché, les mêmes principes d'analyse technique s'appliquent partout."
+    },
+    {
+      type:"text",
+      heading:"Choisir un broker et ouvrir un compte démo",
+      body:"Avant de risquer un seul dollar réel, tu dois passer par un compte démo. C'est non négociable. Un compte démo simule le marché réel avec de l'argent virtuel, sur la même plateforme que tu utiliseras en argent réel.\n\nLa plateforme la plus utilisée en 2026 reste MetaTrader 5 (MT5). C'est gratuit, disponible sur ordinateur, mobile et navigateur web. Choisis un broker régulé qui offre MT5, propose le spread serré sur XAUUSD, et permet l'ouverture de comptes démo illimités.\n\nÀ l'ouverture d'un compte démo : choisis un capital de départ réaliste (10 000$ est un bon standard pour s'entraîner), choisis le bon type de compte (Standard suffit pour débuter), et assure-toi que le symbole XAUUSD est bien disponible dans la liste des actifs.\n\nNe saute jamais cette étape. Le compte démo te permet de faire toutes tes erreurs de débutant sans qu'elles coûtent un sou. Vise minimum 20-30 trades en démo avant de penser à l'argent réel."
+    },
+    {
+      type:"text",
+      heading:"Les types d'ordres : comment entrer sur le marché",
+      body:"Un ordre, c'est l'instruction que tu donnes au broker pour acheter ou vendre. Il existe plusieurs types, et bien les comprendre t'évite des erreurs coûteuses.\n\nOrdre au marché (Market Order) : tu achètes ou vends immédiatement, au prix actuel du marché. C'est le plus simple et le plus utilisé pour les entrées rapides.\n\nOrdre Limite (Limit Order) : tu places un ordre qui s'exécutera seulement si le prix atteint un niveau précis, plus avantageux que le prix actuel. Buy Limit : achète si le prix descend à un niveau X. Sell Limit : vend si le prix monte à un niveau X.\n\nOrdre Stop (Stop Order) : l'inverse du Limit. Il s'exécute si le prix atteint un niveau moins avantageux, généralement pour suivre une cassure. Buy Stop : achète si le prix monte au-dessus d'un niveau (cassure haussière). Sell Stop : vend si le prix descend sous un niveau (cassure baissière).\n\nStop Loss (SL) : le niveau auquel ta position se ferme automatiquement pour limiter ta perte. OBLIGATOIRE sur chaque trade, sans exception.\n\nTake Profit (TP) : le niveau auquel ta position se ferme automatiquement pour sécuriser ton profit. Optionnel, tu peux aussi fermer manuellement."
+    },
+    {
+      type:"candleDiagram",
+      heading:"Lire une bougie japonaise",
+      body:"Chaque bougie raconte une bataille entre acheteurs et vendeurs sur une période de temps. Le corps montre l'écart entre le prix d'ouverture (open) et de fermeture (close). Les mèches, en haut et en bas, montrent les extrêmes atteints (high et low) avant que le prix ne revienne.\n\nBougie verte (haussière) : le close est plus haut que l'open, les acheteurs ont gagné la bataille.\nBougie rouge (baissière) : le close est plus bas que l'open, les vendeurs ont gagné.\n\nC'est la base de tout le reste. Si tu ne sais pas lire une bougie d'un coup d'oeil, relis cette section avant de continuer."
+    },
+    {
+      type:"text",
+      heading:"Les bougies spéciales à reconnaître",
+      body:"Au-delà de simplement haussière/baissière, certaines bougies envoient des signaux précis sur l'état de la bataille acheteurs/vendeurs.\n\nDoji : le corps est minuscule ou inexistant, l'open et le close sont presque identiques. Ça signale une indécision totale du marché, souvent juste avant un retournement ou une accélération.\n\nMarteau (Hammer) : petit corps en haut, longue mèche basse, peu ou pas de mèche haute. Apparaît en bas d'une tendance baissière. Signale un rejet fort des vendeurs, les acheteurs reprennent le contrôle vers la fin de la bougie.\n\nÉtoile filante (Shooting Star) : petit corps en bas, longue mèche haute, peu ou pas de mèche basse. Apparaît en haut d'une tendance haussière. Signale un rejet fort des acheteurs, les vendeurs reprennent le contrôle.\n\nBougie engloutissante (Engulfing) : une bougie dont le corps englobe complètement le corps de la bougie précédente, dans la direction opposée. Une engulfing haussière après une chute est un signal de retournement puissant. Pareil pour l'engulfing baissière en haut d'une hausse.\n\nCes signaux sont plus fiables sur les timeframes plus élevés (H1, H4, Daily) et lorsqu'ils apparaissent sur un niveau clé (support, résistance, order block)."
+    },
+    {
+      type:"text",
+      heading:"L'effet de levier : ton meilleur ami ou ton pire ennemi",
+      body:"Le levier te permet de contrôler une grosse position avec un petit capital. Ça semble génial, jusqu'à ce que tu comprennes pourquoi c'est aussi dangereux.\n\nÇa multiplie tout, pas juste les gains. Un mouvement de +1% peut générer +100% sur ton capital, ou -100% en quelques minutes.\n\nC'est la cause numéro un des comptes qui explosent chez les débutants : sur-levier, appel de marge, liquidation totale.\n\nÇa change complètement ta gestion du risque. Avec un levier x20, 1% de risque sur la position peut représenter 20% de ton capital réel si tu n'ajustes pas ta taille de position.\n\nÇa joue avec ta tête. Des swings violents créent peur, avidité, revenge trading. Comprendre le levier, c'est comprendre pourquoi la discipline n'est jamais optionnelle.\n\nL'appel de marge (margin call) survient quand tes pertes flottantes deviennent trop importantes par rapport à ton capital disponible. Le broker te force alors à fermer des positions, parfois automatiquement, souvent au pire moment possible."
+    },
+    {
+      type:"table",
+      heading:"Trouve ton style",
+      headers:["Style","Durée du trade","Trades / jour","Timeframe"],
+      rows:[
+        ["Scalping","Secondes à 15 min","10 à 100+","M1, M5"],
+        ["Day Trading","Minutes à quelques heures","1 à 10","M5, M15, H1"],
+        ["Swing Trading","2 jours à plusieurs semaines","1 à 5 / semaine","H1, H4, Daily"]
+      ],
+      callout:"Il n'y a pas de style meilleur que les autres, seulement celui qui correspond à ta personnalité, ton temps disponible, et ta tolérance au risque."
+    },
+    {
+      type:"text",
+      heading:"Maîtriser TradingView : ton outil d'analyse",
+      body:"TradingView est la plateforme d'analyse de référence dans l'industrie, même si tu exécutes tes trades sur MT5. Elle offre des graphiques plus avancés, plus d'outils de dessin, et une communauté immense.\n\nLes fonctions essentielles à maîtriser : changer de timeframe rapidement (raccourcis numériques), tracer des lignes de tendance et des niveaux horizontaux, ajouter des indicateurs (moyennes mobiles, RSI), et sauvegarder tes templates d'analyse pour réutiliser ta configuration préférée à chaque session.\n\nAjouter un indicateur personnalisé : sur TradingView, tu peux chercher des scripts publiés par la communauté (comme l'indicateur Yashysako pour XAUUSD) via la barre de recherche d'indicateurs, puis l'ajouter directement sur ton graphique.\n\nConseil pratique : configure 2-3 layouts différents (un par timeframe que tu utilises pour ton analyse top-down) pour gagner du temps à chaque session de trading."
+    }
+  ],
+  quiz: [
+    {
+      q:"Quel marché est ouvert 24 heures sur 24, 7 jours sur 7, même le week-end ?",
+      options:["Le Forex","Les cryptomonnaies","Les futures","Les commodités"],
+      correct:1,
+      explain:"Le Forex ferme le week-end. Les cryptos, elles, ne dorment jamais."
+    },
+    {
+      q:"Pourquoi est-il essentiel de passer par un compte démo avant le réel ?",
+      options:["C'est obligatoire légalement","Pour faire ses erreurs de débutant sans perdre d'argent réel","Les comptes démo donnent de meilleurs résultats","Ce n'est pas vraiment nécessaire si on est confiant"],
+      correct:1,
+      explain:"Le compte démo simule le marché réel sans risque financier. C'est l'endroit pour faire tes erreurs de débutant avant qu'elles ne coûtent réellement de l'argent."
+    },
+    {
+      q:"Tu veux acheter seulement si le prix descend à un niveau plus avantageux que le prix actuel. Quel ordre utilises-tu ?",
+      options:["Buy Stop","Sell Limit","Buy Limit","Market Order"],
+      correct:2,
+      explain:"Buy Limit : achète si le prix descend à un niveau plus avantageux (plus bas) que le prix actuel."
+    },
+    {
+      q:"Sur une bougie verte (haussière), que représente le HAUT du corps ?",
+      options:["Le prix d'ouverture (open)","Le prix de fermeture (close)","Le plus haut (high)","Le plus bas (low)"],
+      correct:1,
+      explain:"Sur une bougie haussière, le close est plus haut que l'open, donc le haut du corps correspond au close."
+    },
+    {
+      q:"Une bougie avec un petit corps en haut, une longue mèche basse, apparaît en bas d'une tendance baissière. De quelle bougie s'agit-il ?",
+      options:["Étoile filante","Doji","Marteau (Hammer)","Engulfing baissière"],
+      correct:2,
+      explain:"Le marteau (hammer) a un petit corps en haut avec une longue mèche basse. En bas d'une tendance, il signale un rejet fort des vendeurs."
+    },
+    {
+      q:"Pourquoi le levier est-il particulièrement dangereux pour un débutant ?",
+      options:["Il ralentit l'exécution des ordres","Il ne fonctionne que sur le Forex","Il multiplie les pertes aussi fort que les gains","Il est interdit par la plupart des brokers"],
+      correct:2,
+      explain:"Le levier amplifie tout, dans les deux sens, c'est exactement ça le piège."
+    },
+    {
+      q:"Qu'est-ce qu'un appel de marge (margin call) ?",
+      options:["Un bonus offert par le broker","Le broker te force à fermer tes positions car tes pertes en cours (positions encore ouvertes et en moins-value) sont trop grandes par rapport à ton capital","Un appel téléphonique du broker pour vérifier ton identité","Une commission supplémentaire sur les gros trades"],
+      correct:1,
+      explain:"L'appel de marge (margin call) : quand tes pertes sur des positions ouvertes deviennent trop grandes par rapport à ton capital, le broker ferme tout automatiquement pour se protéger — souvent au pire moment."
+    },
+    {
+      q:"XAUUSD représente quelle paire ?",
+      options:["L'euro contre le dollar US","L'or contre le dollar US","L'argent contre l'euro","Le pétrole contre le dollar US"],
+      correct:1,
+      explain:"XAU est le symbole de l'or. XAUUSD est donc le prix de l'or exprimé en dollars américains."
+    },
+    {
+      q:"Quel style convient à quelqu'un qui ne peut pas surveiller les graphiques toute la journée, mais accepte un risque overnight (risque que le marché bouge pendant la nuit quand tu dors) ?",
+      options:["Scalping","Day Trading","Swing Trading","Aucun, il faut toujours surveiller"],
+      correct:2,
+      explain:"Le swing trading garde des positions ouvertes plusieurs jours. Avantage : peu de temps devant l'écran. Inconvénient : le marché peut bouger contre toi la nuit ou le week-end quand tu n'es pas là."
+    },
+    {
+      q:"Combien de trades par jour fait typiquement un scalpeur ?",
+      options:["1 à 2","1 à 5","10 à 100+","Aucun, c'est hebdomadaire"],
+      correct:2,
+      explain:"Le scalping vise des dizaines, parfois des centaines, de petits trades rapides chaque jour."
+    }
+  ],
+  exercise: {
+    steps: [
+      {
+        kind:"choice",
+        instruction:"Tu veux acheter (entrer en LONG = parier à la hausse) seulement si le prix casse au-dessus d'une résistance à 2 050$ (donc à un prix plus haut et moins favorable que le prix actuel de 2 040$). Quel type d'ordre places-tu ?",
+        options:["Buy Limit à 2 050$","Buy Stop à 2 050$","Sell Limit à 2 050$","Market Order immédiat"],
+        correctIndex:1,
+        successText:"Exactement. Buy Stop : tu achètes seulement si le prix MONTE jusqu'à ce niveau, ce qui est moins avantageux que le prix actuel. C'est l'ordre parfait pour suivre une cassure de résistance.",
+        hintText:"Tu veux acheter à un prix plus HAUT que le prix actuel pour suivre une cassure. C'est la définition d'un ordre Stop, pas Limit."
+      },
+      {
+        kind:"click-target",
+        instruction:"Ce graphique vient de rebondir deux fois sur le même niveau avant de partir en tendance haussière. Clique sur le graphique, à l'endroit où se trouve la zone de SUPPORT.",
+        candles:[
+          {o:104,h:105,l:100,c:101},
+          {o:101,h:103,l:100.5,c:102.5},
+          {o:102.5,h:104,l:101,c:101.5},
+          {o:101.5,h:102,l:100.2,c:101.8},
+          {o:101.8,h:103,l:101,c:102.8},
+          {o:102.8,h:104.5,l:102.5,c:104},
+          {o:104,h:106,l:103.8,c:105.8},
+          {o:105.8,h:107.5,l:105,c:107},
+          {o:107,h:108,l:106.2,c:106.8},
+          {o:106.8,h:108.5,l:106.5,c:108.2},
+          {o:108.2,h:110,l:107.8,c:109.7},
+          {o:109.7,h:111,l:109,c:109.3},
+          {o:109.3,h:111.5,l:109,c:111},
+          {o:111,h:113,l:110.5,c:112.6},
+          {o:112.6,h:114,l:112,c:113.5},
+          {o:113.5,h:115,l:113,c:114.7}
+        ],
+        targets:[{id:"support", priceMin:99.3, priceMax:101.3}],
+        successText:"Exactement. Le prix a touché cette zone deux fois sans la casser, c'est précisément la définition d'un support qui tient.",
+        hintText:"Indice : regarde où les mèches du bas touchent presque le même niveau, deux fois, juste avant que le prix reparte vers le haut."
+      },
+      {
+        kind:"click-target",
+        instruction:"Identifie la bougie MARTEAU (Hammer) sur ce graphique : petit corps en haut, longue mèche basse, apparaissant en bas d'une tendance baissière.",
+        candles:[
+          {o:112,h:113,l:111,c:111.5},
+          {o:111.5,h:112,l:110,c:110.5},
+          {o:110.5,h:111,l:108.5,c:109},
+          {o:109,h:109.5,l:107,c:107.5},
+          {o:107.5,h:108,l:105,c:105.5},
+          {o:105.5,h:106.2,l:101,c:105.8},
+          {o:105.8,h:108,l:105.3,c:107.5},
+          {o:107.5,h:110,l:107,c:109.5},
+          {o:109.5,h:112,l:109,c:111.5},
+          {o:111.5,h:114,l:111,c:113.5}
+        ],
+        targets:[{id:"hammer", priceMin:101, priceMax:106.2}],
+        successText:"Parfait. Cette bougie a un tout petit corps en haut (105.5 à 105.8) et une longue mèche qui descend jusqu'à 101 — c'est un marteau classique. Les vendeurs ont poussé fort, mais les acheteurs ont repris le contrôle avant la clôture.",
+        hintText:"Cherche la bougie avec la longue mèche qui descend beaucoup plus bas que son petit corps, juste avant que le prix ne remonte."
+      }
+    ]
+  }
+};
+
+var STORAGE_KEY = "emberAcademy_progress_v1";
+var ACCESS_KEY = "emberAcademy_access_v1";
+
+function defaultProgress(){ return {unlocked:[1], completed:[]}; }
+function loadProgress(){
+  try{
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultProgress();
+    var parsed = JSON.parse(raw);
+    var base = defaultProgress();
+    if(parsed && parsed.unlocked) base.unlocked = parsed.unlocked;
+    if(parsed && parsed.completed) base.completed = parsed.completed;
+    return base;
+  }catch(e){ return defaultProgress(); }
+}
+function saveProgress(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }catch(e){}
+}
+function hasAccess(){
+  try{ return localStorage.getItem(ACCESS_KEY) === "granted"; }catch(e){ return false; }
+}
+function grantAccess(){
+  try{ localStorage.setItem(ACCESS_KEY, "granted"); }catch(e){}
+}
+
+var progress = loadProgress();
+var nav = {screen:"gate", moduleId:null, lessonIdx:0, quizIdx:0, quizScore:0, quizSelected:null, quizLocked:false, exerciseStepIdx:0, exerciseAttempts:0};
+var root = document.getElementById("app");
+
+function setScreen(screen, extra){
+  nav.screen = screen;
+  if(extra){ for(var k in extra){ nav[k]=extra[k]; } }
+  render();
+  window.scrollTo(0,0);
+}
+
+function moduleStatus(id){
+  if(progress.completed.indexOf(id) !== -1) return "completed";
+  if(progress.unlocked.indexOf(id) !== -1) return "unlocked";
+  return "locked";
+}
+
+function enterModule(id){
+  setScreen("lesson", {moduleId:id, lessonIdx:0});
+}
+
+function completeModule(id){
+  if(progress.completed.indexOf(id) === -1) progress.completed.push(id);
+  var idx = -1;
+  for(var i=0;i<MODULE_META.length;i++){ if(MODULE_META[i].id===id){ idx=i; break; } }
+  var next = MODULE_META[idx+1];
+  if(next && progress.unlocked.indexOf(next.id) === -1) progress.unlocked.push(next.id);
+  saveProgress();
+  setScreen("moduleComplete");
+}
+
+function render(){
+  if(nav.screen === "gate") renderGate();
+  else if(nav.screen === "dashboard") renderDashboard();
+  else if(nav.screen === "lesson") renderLesson();
+  else if(nav.screen === "quiz") renderQuiz();
+  else if(nav.screen === "exercise") renderExercise();
+  else if(nav.screen === "moduleComplete") renderModuleComplete();
+  else renderDashboard();
+}
+
+function renderGate(){
+  root.innerHTML =
+    '<div class="gate-screen">' +
+      '<div class="gate-card" id="gateCard">' +
+        '<div class="gate-mark">' + ICONS.flame + '</div>' +
+        '<h1 class="gate-title">EMBER TRADING</h1>' +
+        '<p class="gate-sub">Académie Interactive</p>' +
+        '<p class="gate-desc">Cette formation est réservée aux membres. Entre ton code d\u2019accès pour commencer.</p>' +
+        '<div id="gateForm" class="gate-form">' +
+          '<input id="codeInput" class="gate-input" type="text" placeholder="EMBER-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" />' +
+          '<button type="button" id="unlockBtn" class="btn btn-primary">Déverrouiller</button>' +
+        '</div>' +
+        '<p id="gateError" class="gate-error" hidden>Code invalide. Vérifie l\u2019orthographe ou contacte le support.</p>' +
+        '<p class="gate-footer">Pas encore de code ? <a href="mailto:samdamours@outlook.com">Contactez-nous</a></p>' +
+        '<div class="gate-social">' +
+          '<a href="https://t.me/Yashysako" target="_blank" rel="noopener" class="gate-social-btn" title="Telegram">' +
+            '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>' +
+          '</a>' +
+          '<a href="mailto:samdamours@outlook.com" class="gate-social-btn" title="Email">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>' +
+          '</a>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  var input = document.getElementById("codeInput");
+  var error = document.getElementById("gateError");
+  var card = document.getElementById("gateCard");
+  var unlockBtn = document.getElementById("unlockBtn");
+
+  function tryUnlock(){
+    var raw = input.value.replace(/[^A-Za-z0-9]/g,"").toUpperCase();
+    var h = hashCode(input.value);
+
+    if(raw === "DEV1101"){
+      grantAccess();
+      progress.unlocked = [1,2,3,4,5,6,7,8];
+      progress.completed = [];
+      saveProgress();
+      setScreen("dashboard");
+      return;
+    }
+
+    if(ACCESS_HASHES.indexOf(h) !== -1){
+      grantAccess();
+      setScreen("dashboard");
+    } else {
+      error.hidden = false;
+      card.classList.add("shake");
+      setTimeout(function(){ card.classList.remove("shake"); }, 400);
+    }
+  }
+
+  unlockBtn.addEventListener("click", tryUnlock);
+  input.addEventListener("keydown", function(e){
+    if(e.key === "Enter" || e.keyCode === 13){
+      e.preventDefault();
+      tryUnlock();
+    }
+  });
+}
+
+function renderDashboard(){
+  var totalDone = progress.completed.length;
+  var totalAll = MODULE_META.length;
+  var pct = Math.round((totalDone/totalAll)*100);
+
+  var nodesHtml = MODULE_META.map(function(m){
+    var status = moduleStatus(m.id);
+    var badge = "";
+    if(status === "locked") badge = '<span class="node-badge">' + ICONS.lock + '</span>';
+    if(status === "completed") badge = '<span class="node-badge">' + ICONS.check + '</span>';
+    var clickable = status !== "locked";
+    return (
+      '<div class="node ' + status + (clickable ? ' node-clickable' : '') + '" data-id="' + m.id + '">' +
+        '<div class="node-circle">' + ICONS[m.icon] + badge + '</div>' +
+        '<div class="node-info">' +
+          '<div class="node-title">' + m.title + '</div>' +
+          '<div class="node-tag">' + m.tagline + '</div>' +
+          (status === "unlocked" ? '<span class="node-status">À débuter</span>' : '') +
+          (status === "completed" ? '<span class="node-status">Complété</span>' : '') +
+        '</div>' +
+      '</div>'
+    );
+  }).join("");
+
+  root.innerHTML =
+    '<div class="dashboard">' +
+      '<div class="dash-header">' +
+        '<div class="dash-mark">' + ICONS.flame + '</div>' +
+        '<div class="dash-titles"><div class="dash-brand">EMBER TRADING</div><div class="dash-sub">Académie Interactive</div></div>' +
+      '</div>' +
+      '<div class="dash-progress">' +
+        '<div class="dash-progress-label"><span>Progression</span><span>' + totalDone + ' / ' + totalAll + ' modules</span></div>' +
+        '<div class="dash-progress-track"><div class="dash-progress-fill" style="width:' + pct + '%"></div></div>' +
+      '</div>' +
+      '<div class="path-list">' +
+        '<div class="path-line"><div class="path-line-fill" style="height:' + pct + '%"></div></div>' +
+        nodesHtml +
+      '</div>' +
+      '<div class="dash-footer">' +
+        '<div class="dash-tagline">Short Step. Long Vision.</div>' +
+        '<button class="dash-reset" id="resetBtn">Réinitialiser la progression</button>' +
+      '</div>' +
+    '</div>';
+
+  var nodeEls = root.querySelectorAll(".node-clickable");
+  for(var i=0;i<nodeEls.length;i++){
+    nodeEls[i].addEventListener("click", function(){
+      enterModule(parseInt(this.getAttribute("data-id"), 10));
+    });
+  }
+  document.getElementById("resetBtn").addEventListener("click", function(){
+    if(confirm("Réinitialiser toute la progression dans l\u2019Académie ? Cette action est irréversible.")){
+      progress = defaultProgress();
+      saveProgress();
+      render();
+    }
+  });
+}
+
+function bodyToHtml(body){
+  return body.split("\n\n").map(function(p){ return "<p>" + p + "</p>"; }).join("");
+}
+
+function renderSection(sec){
+  if(sec.type === "candleDiagram"){
+    return '<h3 class="lesson-heading">' + sec.heading + '</h3>' + CANDLE_DIAGRAM_SVG + '<div class="lesson-body">' + bodyToHtml(sec.body) + '</div>';
+  }
+  if(sec.type === "table"){
+    var head = sec.headers.map(function(h){ return "<th>" + h + "</th>"; }).join("");
+    var rows = sec.rows.map(function(r){
+      return "<tr>" + r.map(function(c){ return "<td>" + c + "</td>"; }).join("") + "</tr>";
+    }).join("");
+    var callout = sec.callout ? '<div class="lesson-callout">' + sec.callout + '</div>' : "";
+    return '<h3 class="lesson-heading">' + sec.heading + '</h3><div class="table-wrap"><table class="lesson-table"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table></div>' + callout;
+  }
+  return '<h3 class="lesson-heading">' + sec.heading + '</h3><div class="lesson-body">' + bodyToHtml(sec.body) + '</div>';
+}
+
+function renderLesson(){
+  var content = MODULE_CONTENT[nav.moduleId] || PLACEHOLDER_CONTENT;
+  var sections = content.lesson;
+  var sec = sections[nav.lessonIdx];
+  var isLast = nav.lessonIdx === sections.length - 1;
+
+  var dots = sections.map(function(s, idx){
+    return '<div class="lesson-dot' + (idx <= nav.lessonIdx ? ' done' : '') + '"></div>';
+  }).join("");
+
+  root.innerHTML =
+    '<div class="screen">' +
+      '<div class="screen-header">' +
+        '<button class="link-back" id="backDash">← Tableau de bord</button>' +
+        '<span class="screen-tag">Leçon ' + (nav.lessonIdx+1) + ' / ' + sections.length + '</span>' +
+      '</div>' +
+      '<div class="lesson-progress">' + dots + '</div>' +
+      '<div class="lesson-card">' + renderSection(sec) + '</div>' +
+      '<div class="lesson-nav">' +
+        (nav.lessonIdx > 0 ? '<button class="btn btn-secondary" id="prevBtn">Précédent</button>' : '<span></span>') +
+        '<button class="btn btn-primary" id="nextBtn">' + (isLast ? "Aller au quiz" : "Suivant") + '</button>' +
+      '</div>' +
+    '</div>';
+
+  document.getElementById("backDash").addEventListener("click", function(){ setScreen("dashboard"); });
+  var prevBtn = document.getElementById("prevBtn");
+  if(prevBtn) prevBtn.addEventListener("click", function(){ nav.lessonIdx--; render(); window.scrollTo(0,0); });
+  document.getElementById("nextBtn").addEventListener("click", function(){
+    if(isLast){
+      setScreen("quiz", {quizIdx:0, quizScore:0, quizSelected:null, quizLocked:false});
+    } else {
+      nav.lessonIdx++; render(); window.scrollTo(0,0);
+    }
+  });
+}
+
+function renderQuiz(){
+  var content = MODULE_CONTENT[nav.moduleId];
+  var questions = content.quiz;
+  if(nav.quizIdx >= questions.length){
+    renderQuizResult(questions);
+    return;
+  }
+  var q = questions[nav.quizIdx];
+  var total = questions.length;
+
+  root.innerHTML =
+    '<div class="screen">' +
+      '<div class="screen-header">' +
+        '<button class="link-back" id="backDash">← Tableau de bord</button>' +
+        '<span class="screen-tag">Question ' + (nav.quizIdx+1) + ' / ' + total + '</span>' +
+      '</div>' +
+      '<div class="quiz-card">' +
+        '<h3 class="quiz-question">' + q.q + '</h3>' +
+        '<div class="quiz-options" id="quizOptions">' +
+          q.options.map(function(opt,i){ return '<button class="quiz-option" data-i="' + i + '">' + opt + '</button>'; }).join("") +
+        '</div>' +
+        '<p id="quizExplain" class="quiz-explain" hidden></p>' +
+        '<div id="quizActions" class="quiz-actions"></div>' +
+      '</div>' +
+    '</div>';
+
+  document.getElementById("backDash").addEventListener("click", function(){ setScreen("dashboard"); });
+
+  var optionEls = Array.prototype.slice.call(document.querySelectorAll(".quiz-option"));
+  optionEls.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      if(nav.quizLocked) return;
+      nav.quizLocked = true;
+      var i = parseInt(btn.getAttribute("data-i"), 10);
+      nav.quizSelected = i;
+      if(i === q.correct) nav.quizScore++;
+      optionEls.forEach(function(b, bi){
+        b.disabled = true;
+        if(bi === q.correct) b.classList.add("correct");
+        else if(bi === i) b.classList.add("incorrect");
+      });
+      var explain = document.getElementById("quizExplain");
+      explain.hidden = false;
+      explain.textContent = q.explain;
+      var actions = document.getElementById("quizActions");
+      var isLastQ = (nav.quizIdx + 1) >= total;
+      actions.innerHTML = '<button class="btn btn-primary" id="nextQ">' + (isLastQ ? "Voir le résultat" : "Question suivante") + '</button>';
+      document.getElementById("nextQ").addEventListener("click", function(){
+        nav.quizIdx++; nav.quizSelected=null; nav.quizLocked=false; render(); window.scrollTo(0,0);
+      });
+    });
+  });
+}
+
+function renderQuizResult(questions){
+  var total = questions.length;
+  var score = nav.quizScore;
+  var pct = Math.round((score/total)*100);
+  var pass = (score/total) >= 0.8;
+
+  root.innerHTML =
+    '<div class="screen">' +
+      '<div class="quiz-result-card">' +
+        '<h2 class="quiz-result-title">' + (pass ? "Excellent !" : "Résultat insuffisant") + '</h2>' +
+        '<p class="quiz-result-score">' + score + ' / ' + total + ' (' + pct + '%)</p>' +
+        '<p class="quiz-result-msg">' + (pass ? "Excellent ! Score de 80% ou plus atteint. Direction l\u2019exercice pratique." : "Le seuil minimal est de 80%. Veuillez reprendre le quiz — chaque question est une occasion d'apprendre.") + '</p>' +
+        '<button class="btn btn-primary" id="quizNextStep">' + (pass ? "Continuer vers l\u2019exercice" : "Recommencer le quiz") + '</button>' +
+      '</div>' +
+    '</div>';
+
+  document.getElementById("quizNextStep").addEventListener("click", function(){
+    if(pass){
+      setScreen("exercise", {exerciseAttempts:0, exerciseStepIdx:0});
+    } else {
+      nav.quizIdx=0; nav.quizScore=0; nav.quizSelected=null; nav.quizLocked=false; render(); window.scrollTo(0,0);
+    }
+  });
+}
+
+function priceRange(candles){
+  var lo = Infinity, hi = -Infinity;
+  candles.forEach(function(c){ if(c.l < lo) lo = c.l; if(c.h > hi) hi = c.h; });
+  var pad = (hi-lo) * 0.08;
+  return {min: lo-pad, max: hi+pad};
+}
+
+function drawCandles(ctx, candles, w, h, zones){
+  ctx.clearRect(0,0,w,h);
+  var range = priceRange(candles);
+  var min = range.min, max = range.max;
+  function priceToY(p){ return h - ((p-min)/(max-min)) * h; }
+  var n = candles.length;
+  var slot = w/n;
+  var bodyW = Math.max(slot*0.55, 3);
+
+  ctx.strokeStyle = "rgba(255,255,255,0.04)";
+  ctx.lineWidth = 1;
+  for(var gy=1; gy<4; gy++){
+    var y = (h/4)*gy;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+  }
+
+  candles.forEach(function(c, i){
+    var x = i*slot + slot/2;
+    var up = c.c >= c.o;
+    var color = up ? "#36c98e" : "#ef4b4b";
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(x, priceToY(c.h));
+    ctx.lineTo(x, priceToY(c.l));
+    ctx.stroke();
+    var yTop = priceToY(Math.max(c.o,c.c));
+    var yBot = priceToY(Math.min(c.o,c.c));
+    var bh = Math.max(yBot-yTop, 1.5);
+    ctx.fillRect(x-bodyW/2, yTop, bodyW, bh);
+  });
+
+  if(zones){
+    zones.forEach(function(z){
+      var y1 = priceToY(z.priceMax), y2 = priceToY(z.priceMin);
+      ctx.fillStyle = z.color || "rgba(255,178,60,0.18)";
+      ctx.fillRect(0, y1, w, y2-y1);
+      ctx.strokeStyle = z.strokeColor || "rgba(255,178,60,0.8)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(0, y1, w, y2-y1);
+    });
+  }
+}
+
+function setupCanvas(canvas, cssHeight){
+  var rect = canvas.parentElement.getBoundingClientRect();
+  var dpr = window.devicePixelRatio || 1;
+  var cssW = rect.width - 20;
+  canvas.style.width = cssW + "px";
+  canvas.style.height = cssHeight + "px";
+  canvas.width = Math.round(cssW*dpr);
+  canvas.height = Math.round(cssHeight*dpr);
+  var ctx = canvas.getContext("2d");
+  ctx.scale(dpr,dpr);
+  return {ctx:ctx, w:cssW, h:cssHeight};
+}
+
+function exerciseAdvance(){
+  var content = MODULE_CONTENT[nav.moduleId];
+  var steps = content.exercise.steps;
+  if(nav.exerciseStepIdx + 1 < steps.length){
+    nav.exerciseStepIdx++;
+    nav.exerciseAttempts = 0;
+    render();
+    window.scrollTo(0,0);
+  } else {
+    completeModule(nav.moduleId);
+  }
+}
+
+function exerciseStepHeader(stepIdx, total){
+  return total > 1 ? ("Exercice " + (stepIdx+1) + " / " + total) : "Exercice pratique";
+}
+
+function renderExercise(){
+  var content = MODULE_CONTENT[nav.moduleId];
+  var steps = content.exercise.steps;
+  var stepIdx = nav.exerciseStepIdx || 0;
+  var step = steps[stepIdx];
+
+  root.innerHTML =
+    '<div class="screen">' +
+      '<div class="screen-header">' +
+        '<button class="link-back" id="backDash">← Tableau de bord</button>' +
+        '<span class="screen-tag">' + exerciseStepHeader(stepIdx, steps.length) + '</span>' +
+      '</div>' +
+      '<div class="exercise-card" id="exerciseCard"></div>' +
+    '</div>';
+
+  document.getElementById("backDash").addEventListener("click", function(){ setScreen("dashboard"); });
+
+  var card = document.getElementById("exerciseCard");
+
+  if(step.kind === "calc-input"){
+    renderCalcInputStep(card, step);
+  } else if(step.kind === "choice"){
+    renderChoiceStep(card, step);
+  } else {
+    renderClickTargetStep(card, step);
+  }
+}
+
+function renderClickTargetStep(card, step){
+  card.innerHTML =
+    '<p class="exercise-instruction">' + step.instruction + '</p>' +
+    '<div class="chart-wrap"><canvas id="exCanvas"></canvas></div>' +
+    '<p id="exFeedback" class="exercise-feedback" hidden></p>' +
+    '<div id="exActions" class="exercise-actions"></div>';
+
+  var canvas = document.getElementById("exCanvas");
+  var setup = setupCanvas(canvas, 260);
+  var ctx = setup.ctx, w = setup.w, h = setup.h;
+  drawCandles(ctx, step.candles, w, h);
+
+  var solved = false;
+  canvas.addEventListener("click", function(e){
+    if(solved) return;
+    var rect = canvas.getBoundingClientRect();
+    var y = e.clientY - rect.top;
+    var range = priceRange(step.candles);
+    var price = range.min + (1 - y/rect.height) * (range.max-range.min);
+    var hit = null;
+    for(var i=0;i<step.targets.length;i++){
+      var t = step.targets[i];
+      if(price >= t.priceMin && price <= t.priceMax){ hit = t; break; }
+    }
+    var feedback = document.getElementById("exFeedback");
+    var actions = document.getElementById("exActions");
+
+    if(hit){
+      solved = true;
+      drawCandles(ctx, step.candles, w, h, [{priceMin:hit.priceMin, priceMax:hit.priceMax, color:"rgba(54,201,142,0.25)", strokeColor:"#36c98e"}]);
+      feedback.hidden = false;
+      feedback.className = "exercise-feedback ok";
+      feedback.textContent = step.successText;
+      actions.innerHTML = '<button class="btn btn-primary" id="exNext">Continuer</button>';
+      document.getElementById("exNext").addEventListener("click", exerciseAdvance);
+    } else {
+      nav.exerciseAttempts++;
+      var msg;
+      if(nav.exerciseAttempts < 3){
+        msg = "Pas tout à fait, réessaie. (" + nav.exerciseAttempts + "/3 avant un indice)";
+      } else if(nav.exerciseAttempts < 5){
+        msg = step.hintText;
+      } else {
+        solved = true;
+        var revealZones = step.targets.map(function(t){ return {priceMin:t.priceMin, priceMax:t.priceMax, color:"rgba(255,178,60,0.22)", strokeColor:"#ffb23c"}; });
+        drawCandles(ctx, step.candles, w, h, revealZones);
+        msg = "Voici la zone, " + step.successText;
+      }
+      feedback.hidden = false;
+      feedback.className = "exercise-feedback " + (solved ? "ok" : "bad");
+      feedback.textContent = msg;
+      if(solved){
+        actions.innerHTML = '<button class="btn btn-primary" id="exNext">Continuer</button>';
+        document.getElementById("exNext").addEventListener("click", exerciseAdvance);
+      }
+    }
+  });
+
+  window.addEventListener("resize", function onResize(){
+    if(!document.getElementById("exCanvas")){ window.removeEventListener("resize", onResize); return; }
+    var s = setupCanvas(canvas, 260);
+    ctx = s.ctx; w = s.w; h = s.h;
+    drawCandles(ctx, step.candles, w, h);
+  });
+}
+
+function renderCalcInputStep(card, step){
+  var givenHtml = step.given.map(function(g){
+    return '<div class="calc-row"><span class="calc-label">' + g.label + '</span><span class="calc-value">' + g.value + '</span></div>';
+  }).join("");
+
+  card.innerHTML =
+    '<p class="exercise-instruction">' + step.instruction + '</p>' +
+    '<div class="calc-given">' + givenHtml + '</div>' +
+    '<div class="calc-input-row">' +
+      '<input type="number" inputmode="decimal" id="calcInput" class="calc-input" placeholder="Ta réponse" step="any" />' +
+      '<span class="calc-unit">' + (step.unit || "") + '</span>' +
+      '<button class="btn btn-primary" id="calcCheck">Vérifier</button>' +
+    '</div>' +
+    '<p id="exFeedback" class="exercise-feedback" hidden></p>' +
+    '<div id="exActions" class="exercise-actions"></div>';
+
+  var solved = false;
+  function check(){
+    if(solved) return;
+    var input = document.getElementById("calcInput");
+    var val = parseFloat(input.value);
+    var feedback = document.getElementById("exFeedback");
+    var actions = document.getElementById("exActions");
+    var ok = !isNaN(val) && Math.abs(val - step.correctAnswer) <= step.tolerance;
+
+    if(ok){
+      solved = true;
+      feedback.hidden = false;
+      feedback.className = "exercise-feedback ok";
+      feedback.textContent = step.successText;
+      actions.innerHTML = '<button class="btn btn-primary" id="exNext">Continuer</button>';
+      document.getElementById("exNext").addEventListener("click", exerciseAdvance);
+    } else {
+      nav.exerciseAttempts++;
+      var msg;
+      if(nav.exerciseAttempts < 3){
+        msg = "Pas tout à fait, réessaie. (" + nav.exerciseAttempts + "/3 avant un indice)";
+      } else {
+        solved = true;
+        msg = "La bonne réponse était " + step.correctAnswer + (step.unit ? " " + step.unit : "") + ". " + step.successText;
+      }
+      feedback.hidden = false;
+      feedback.className = "exercise-feedback " + (solved ? "ok" : "bad");
+      feedback.textContent = msg;
+      if(solved){
+        actions.innerHTML = '<button class="btn btn-primary" id="exNext">Continuer</button>';
+        document.getElementById("exNext").addEventListener("click", exerciseAdvance);
+      }
+    }
+  }
+
+  document.getElementById("calcCheck").addEventListener("click", check);
+  document.getElementById("calcInput").addEventListener("keydown", function(e){
+    if(e.key === "Enter" || e.keyCode === 13){ e.preventDefault(); check(); }
+  });
+}
+
+function renderChoiceStep(card, step){
+  card.innerHTML =
+    '<p class="exercise-instruction">' + step.instruction + '</p>' +
+    '<div class="quiz-options" id="exChoices">' +
+      step.options.map(function(opt,i){ return '<button class="quiz-option" data-i="' + i + '">' + opt + '</button>'; }).join("") +
+    '</div>' +
+    '<p id="exFeedback" class="exercise-feedback" hidden></p>' +
+    '<div id="exActions" class="exercise-actions"></div>';
+
+  var optionEls = Array.prototype.slice.call(document.querySelectorAll("#exChoices .quiz-option"));
+  var answered = false;
+  optionEls.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      if(answered) return;
+      answered = true;
+      var i = parseInt(btn.getAttribute("data-i"), 10);
+      var correct = i === step.correctIndex;
+      optionEls.forEach(function(b, bi){
+        b.disabled = true;
+        if(bi === step.correctIndex) b.classList.add("correct");
+        else if(bi === i) b.classList.add("incorrect");
+      });
+      var feedback = document.getElementById("exFeedback");
+      feedback.hidden = false;
+      feedback.className = "exercise-feedback " + (correct ? "ok" : "bad");
+      feedback.textContent = correct ? step.successText : (step.hintText + " " + step.successText);
+      var actions = document.getElementById("exActions");
+      actions.innerHTML = '<button class="btn btn-primary" id="exNext">Continuer</button>';
+      document.getElementById("exNext").addEventListener("click", exerciseAdvance);
+    });
+  });
+}
+
+function renderModuleComplete(){
+  var idx = -1;
+  for(var j=0;j<MODULE_META.length;j++){ if(MODULE_META[j].id===nav.moduleId) idx=j; }
+  var mod = MODULE_META[idx];
+  var next = MODULE_META[idx+1];
+  var isFinal = !next;
+
+  if(isFinal){ renderCertificate(); return; }
+
+  root.innerHTML =
+    '<div class="complete-screen">' +
+      '<div class="complete-card">' +
+        '<div class="complete-icon">' + ICONS.flame + '</div>' +
+        '<h2 class="complete-title">Module terminé !</h2>' +
+        '<p class="complete-sub">' + mod.title + '</p>' +
+        '<p class="complete-next">Module débloqué : <strong>' + next.title + '</strong></p>' +
+        '<button class="btn btn-primary" id="toDash">Retour au tableau de bord</button>' +
+      '</div>' +
+    '</div>';
+
+  document.getElementById("toDash").addEventListener("click", function(){ setScreen("dashboard"); });
+}
+
+function renderCertificate(){
+  var today = new Date();
+  var months = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+  var dateStr = today.getDate() + " " + months[today.getMonth()] + " " + today.getFullYear();
+
+  /* Wax seal SVG */
+  var sealSvg =
+    '<svg class="cert-seal-svg" viewBox="0 0 72 72">' +
+      /* outer jagged ring */ 
+      '<polygon points="36,2 40,6 45,3 48,8 54,6 55,12 61,12 60,18 66,20 63,26 68,30 63,34 67,40 61,42 62,48 56,49 55,55 49,54 46,60 40,57 36,62 32,57 26,60 23,54 17,55 16,49 10,48 11,42 5,40 9,34 4,30 9,26 6,20 12,18 11,12 17,12 18,6 24,8 27,3 32,6" fill="#2a1a06" stroke="#ff8a1e" stroke-width="1.2"/>' +
+      /* inner circle */ 
+      '<circle cx="36" cy="32" r="18" fill="#1e1208" stroke="#ffc24b" stroke-width="0.8"/>' +
+      /* flame icon */
+      '<path d="M36 18 C36 18 31 23 31 27.5 C31 31.5 33 34 36 34 C39 34 41 31.5 41 27.5 C41 23 36 18 36 18 Z" fill="#ff8a1e"/>' +
+      /* EMBER text */
+      '<text x="36" y="44" text-anchor="middle" font-family="Oswald,Arial Narrow,sans-serif" font-size="5.5" font-weight="700" fill="#ffc24b" letter-spacing="2">EMBER</text>' +
+      '<text x="36" y="50" text-anchor="middle" font-family="Oswald,Arial Narrow,sans-serif" font-size="4" fill="#ff8a1e" letter-spacing="1.5">TRADING</text>' +
+    '</svg>';
+
+  root.innerHTML =
+    '<div class="cert-screen">' +
+
+      /* Input area */
+      '<div class="cert-input-area">' +
+        '<p class="cert-input-title">🎉 Félicitations — Parcours complété</p>' +
+        '<p class="cert-input-sub">Saisissez votre prénom pour personnaliser votre badge de complétion.</p>' +
+        '<div class="cert-name-row">' +
+          '<input class="cert-name-input" id="certNameInput" type="text" placeholder="Prénom Nom" maxlength="50" />' +
+          '<button class="btn btn-primary" id="certGenBtn">Générer</button>' +
+        '</div>' +
+      '</div>' +
+
+      /* The actual certificate document */
+      '<div class="cert-doc" id="certDoc" hidden>' +
+
+        /* Watermark */
+        '<div class="cert-watermark">' + ICONS.flame + '</div>' +
+
+        '<div class="cert-outer-border">' +
+        '<div class="cert-inner-border">' +
+
+          /* Header */
+          '<div class="cert-header">' +
+            '<div class="cert-logo-row">' +
+              '<div class="cert-logo-icon">' + ICONS.flame + '</div>' +
+              '<span class="cert-org">Ember Trading</span>' +
+            '</div>' +
+            '<div class="cert-divider"><div class="cert-divider-line"></div><div class="cert-divider-diamond"></div><div class="cert-divider-line"></div></div>' +
+          '</div>' +
+
+          /* Main title */
+          '<p class="cert-main-title">Badge de Complétion</p>' +
+          '<p class="cert-subtitle">Parcours Ember Académie terminé</p>' +
+
+          /* Body */
+          '<p class="cert-body-text">Ce badge confirme que</p>' +
+          '<div class="cert-recipient-name" id="certDisplayName"></div>' +
+          '<p class="cert-completion-text">a terminé avec succès l\'intégralité du parcours d\'apprentissage</p>' +
+          '<p class="cert-formation-name">ACADÉMIE INTERACTIVE EMBER TRADING</p>' +
+          '<p class="cert-formation-sub">Fondations · Analyse Technique · Smart Money · Psychologie · Gestion du Risque</p>' +
+
+          '<div class="cert-divider"><div class="cert-divider-line"></div><div class="cert-divider-diamond"></div><div class="cert-divider-line"></div></div>' +
+
+          /* Footer row: date — seal — signature */
+          '<div class="cert-footer-row">' +
+
+            '<div class="cert-date-block">' +
+              '<div class="cert-date-val" id="certDisplayDate"></div>' +
+              '<div class="cert-date-label">Date d\'obtention</div>' +
+            '</div>' +
+
+            '<div class="cert-seal">' + sealSvg + '</div>' +
+
+            '<div class="cert-sig-block">' +
+              '<div class="cert-sig-line"></div>' +
+              '<div class="cert-sig-name">Samuel Damours</div>' +
+              '<div class="cert-sig-role">Fondateur · Ember Trading</div>' +
+            '</div>' +
+
+          '</div>' +
+
+        '</div>' + /* inner border */
+        '</div>' + /* outer border */
+
+      '</div>' + /* cert-doc */
+
+      '<button class="btn btn-secondary" id="toDash" style="max-width:300px;width:100%;">← Retour au tableau de bord</button>' +
+
+    '</div>';
+
+  document.getElementById("certGenBtn").addEventListener("click", function(){
+    var name = document.getElementById("certNameInput").value.trim();
+    if(!name){ document.getElementById("certNameInput").focus(); return; }
+    document.getElementById("certDisplayName").textContent = name;
+    document.getElementById("certDisplayDate").textContent = dateStr;
+    document.getElementById("certDoc").hidden = false;
+    document.getElementById("certGenBtn").textContent = "Recréer";
+    document.getElementById("certDoc").scrollIntoView({behavior:"smooth", block:"center"});
+  });
+
+  document.getElementById("certNameInput").addEventListener("keydown", function(e){
+    if(e.key === "Enter") document.getElementById("certGenBtn").click();
+  });
+
+  document.getElementById("toDash").addEventListener("click", function(){
+    setScreen("dashboard");
+  });
+}
+
+/* ---------- MODULES 2-8 CONTENT ---------- */
+
+MODULE_CONTENT[2] = {
+  lesson:[
+    {type:"text",heading:"Le Forex ne dort jamais, mais il dort quand même un peu",body:"Le marché Forex est techniquement ouvert 24h/24 du dimanche soir au vendredi soir. Mais toutes les heures ne se valent pas : certaines sont explosives, d'autres sont des déserts de liquidité où tu perds tes spreads dans le vide.\n\nLa volatilité suit les sessions bancaires mondiales. Quand les banques ferment, les volumes s'écroulent. Quand deux sessions se chevauchent, les volumes explosent. C'est là que vivent les setups."},
+    {type:"table",heading:"Les 4 sessions et leurs caractéristiques",headers:["Session","Heures (EST)","Volatilité","Meilleur pour"],rows:[["Sydney","17h–02h","Faible","Éviter pour le scalping/day trading"],["Tokyo (Asie)","19h–04h","Moyenne à faible","Yen, ranges asiatiques calmes"],["Londres (Europe)","03h–12h","Très haute","Scalping, day trading, toutes majeures"],["New York (US)","08h–17h","Très haute (8h–12h)","EUR/USD, GBP/USD, XAUUSD"]],callout:"Les overlaps (chevauchements) sont tes meilleurs alliés. Londres+NY de 08h à 12h EST concentre 60%+ du volume mondial. C'est ton créneau principal."},
+    {type:"text",heading:"L'analyse fondamentale : les forces invisibles derrière les prix",body:"L'analyse technique te dit où le prix pourrait aller. L'analyse fondamentale te dit pourquoi il veut y aller.\n\nLes banques centrales sont le moteur principal. Quand la Fed (USA), la BCE (Europe) ou la BoJ (Japon) changent leurs taux d'intérêt, les devises bougent violemment. Un taux plus élevé attire les capitaux étrangers, donc renforce la monnaie.\n\nLes données économiques créent des pics de volatilité immédiats. Le NFP (Non-Farm Payrolls, premier vendredi du mois) est le rapport le plus suivi au monde. L'IPC (inflation), le PIB et les ventes au détail font pareil à leur échelle.\n\nLe contexte géopolitique impacte surtout les actifs refuge. L'or (XAUUSD) monte quand le monde a peur : tensions militaires, instabilité politique, crise financière.\n\nLe risk-on/risk-off résume l'appétit du marché. En mode risk-on, les investisseurs achètent des actifs risqués et vendent les refuges. En mode risk-off, c'est l'inverse : l'or, le yen et le franc suisse montent."},
+    {type:"text",heading:"Comment utiliser le calendrier économique",body:"Règle 1 : Consulte le calendrier avant chaque session. Investing.com et ForexFactory sont gratuits et fiables. Filtre les événements à impact fort (icône rouge).\n\nRègle 2 : En scalping sur XAUUSD, évite d'entrer dans les 15 minutes avant et après un événement à fort impact. Liquidité faible, spreads qui explosent, stop-hunts institutionnels fréquents.\n\nRègle 3 : Apprends à lire la surprise. Un NFP à +200k emplois est bullish pour le dollar. Mais si le marché attendait +300k, c'est quand même perçu comme décevant. C'est l'écart entre l'attendu et le réel qui fait bouger les marchés.\n\nRègle 4 : Sur XAUUSD spécifiquement, surveille tout ce qui affaiblit le dollar (DXY). Un dollar faible = or fort. Une surprise dovish de la Fed est souvent le catalyseur des plus grands moves sur le gold."},
+    {type:"text",heading:"Les événements macro à connaître par coeur",body:"FOMC (Federal Open Market Committee) : la réunion de la Fed, environ 8 fois par an, où elle annonce sa décision sur les taux d'intérêt. C'est l'événement le plus important du calendrier économique américain. La conférence de presse qui suit l'annonce peut créer encore plus de volatilité que l'annonce elle-même.\n\nCPI (Consumer Price Index / IPC) : mesure l'inflation mensuelle. Une inflation plus haute que prévu pousse souvent la banque centrale vers des taux plus élevés, ce qui renforce la devise à court terme.\n\nPIB (Produit Intérieur Brut) : mesure la croissance économique d'un pays, publié trimestriellement. Une croissance plus forte que prévu est généralement positive pour la devise.\n\nVentes au détail (Retail Sales) : indicateur de la santé de la consommation, publié mensuellement. Très suivi pour l'économie américaine car la consommation représente près de 70% du PIB des USA.\n\nDiscours des banquiers centraux : même en dehors des réunions officielles, un discours du président de la Fed peut faire bouger le marché s'il laisse entendre un changement de politique monétaire (forward guidance)."},
+    {type:"text",heading:"Mettre la macro et la technique ensemble",body:"L'erreur classique du débutant : ignorer complètement la macro et trader uniquement la technique, ou l'inverse, ignorer la technique et trader uniquement les news.\n\nLa bonne approche : utilise la macro pour définir ton biais directionnel de la semaine ou de la journée (est-ce que le dollar est fondamentalement fort ou faible en ce moment), puis utilise la technique (structure, S&R, SMC) pour trouver tes points d'entrée précis dans ce biais.\n\nExemple concret : si la Fed vient de signaler une posture plus dovish (moins agressive sur les hausses de taux), ton biais sur XAUUSD devient haussier pour les jours suivants. Tu cherches alors des setups d'ACHAT uniquement, sur tes niveaux techniques (supports, order blocks, FVG), et tu ignores les setups de vente même s'ils semblent intéressants visuellement."}
+  ],
+  quiz:[
+    {q:"Quel overlap est considéré comme le plus volatil et le plus liquide de la journée sur le Forex ?",options:["Tokyo + Sydney","Sydney + New York","Londres + New York","Tokyo + Londres"],correct:2,explain:"Londres + New York de 08h à 12h EST concentre 60%+ du volume mondial. C'est là que les meilleures opportunités se forment."},
+    {q:"Une banque centrale augmente ses taux d'intérêt. Quel impact direct sur sa devise ?",options:["La devise s'affaiblit car les emprunts coûtent plus cher","La devise se renforce car elle attire les capitaux étrangers","Aucun impact, seul le PIB compte","La devise s'affaiblit temporairement puis se renforce"],correct:1,explain:"Un taux plus élevé = les placements dans ce pays rapportent plus = les investisseurs du monde entier veulent y placer leur argent = ils achètent cette monnaie = la devise monte."},
+    {q:"Qu'est-ce que le FOMC ?",options:["Un indicateur technique de momentum","La réunion de la Fed où elle décide des taux d'intérêt","Un type d'ordre sur MT5","Le nom d'une session de trading asiatique"],correct:1,explain:"FOMC = Federal Open Market Committee. C'est la réunion où la Fed annonce sa décision sur les taux, l'événement macro le plus suivi des marchés américains."},
+    {q:"Le NFP est publié quand ?",options:["Tous les jours à 08h30 EST","Le premier vendredi de chaque mois","Le premier lundi de chaque mois","Tous les trimestres"],correct:1,explain:"Non-Farm Payrolls : premier vendredi du mois, 08h30 EST. L'événement le plus suivi sur le Forex."},
+    {q:"En mode risk-off (= période de peur sur les marchés : guerre, crise économique, instabilité politique — les investisseurs fuient les actifs risqués), quel actif monte typiquement ?",options:["Les cryptomonnaies","Les actions technologiques","L'or (XAUUSD)","Les devises émergentes (pays en développement)"],correct:2,explain:"L'or est le refuge par excellence. En mode risk-off, les investisseurs abandonnent les actifs risqués (cryptos, actions) et se réfugient dans l'or, le yen japonais et le franc suisse. C'est pourquoi l'or monte souvent lors des crises mondiales."},
+    {q:"Un NFP attendu à +300k ressort à +180k. Comment le marché réagit-il généralement sur le dollar ?",options:["Le dollar monte, c'est un chiffre positif","Le dollar baisse, c'est une surprise négative","Aucune réaction, les prévisions ne comptent pas","Le dollar monte puis baisse immédiatement"],correct:1,explain:"Le marché trade la surprise, pas le chiffre brut. +180k vs +300k attendu = déception = dollar faible."},
+    {q:"Quelle est la bonne approche pour combiner macro et technique ?",options:["Ignorer la macro et trader uniquement la technique","Utiliser la macro pour le biais directionnel, puis la technique pour les points d'entrée précis","Trader uniquement les news, ignorer les graphiques","Utiliser la macro seulement le vendredi"],correct:1,explain:"La macro donne le biais directionnel (dollar fort/faible, risk-on/risk-off). La technique affine ensuite le point d'entrée précis dans ce biais."},
+    {q:"Qu'est-ce que le DXY ?",options:["Le prix de l'or en dollars","L'indice de force du dollar américain contre un panier de devises","Le taux de la Fed","Un indicateur de volatilité du marché actions"],correct:1,explain:"Le DXY mesure la valeur du dollar contre un panier de 6 devises majeures. DXY monte = dollar fort = or (XAUUSD) souvent baisse."}
+  ],
+  exercise:{steps:[
+    {kind:"choice",instruction:"Il est 09h30 EST un vendredi. Le NFP vient d'être publié il y a deux heures. Tu identifies un beau setup sur XAUUSD. Que fais-tu ? (Le spread, c'est l'écart entre le prix d'achat et le prix de vente — il s'élargit pendant les gros événements macro.)",options:["J'entre immédiatement, la news a été digérée","Je skip complètement, les vendredis après NFP sont dangereux","Je prends une demi-position","J'attends que le spread revienne à la normale et que la structure soit claire, puis j'entre"],correctIndex:3,successText:"La news a 2h de recul, c'est suffisant. Si la structure est propre et le spread normal, le setup est valide.",hintText:"Après un NFP, attends que la volatilité se calme ET que le prix forme une structure lisible."},
+    {kind:"choice",instruction:"Tu veux trader EUR/USD. Il est 22h EST (session Sydney, la moins active). Quelle est la meilleure approche ? (Rappel : le spread = l'écart entre le prix d'achat et le prix de vente. Plus le spread est large, plus ça te coûte cher d'entrer dans un trade.)",options:["Idéal, Sydney est active sur les majeures","Mauvaise idée : spreads larges et liquidité faible sur EUR/USD à cette heure","Correct si tu poses un ordre limit pour l'ouverture de Londres","Ça dépend de la tendance"],correctIndex:1,successText:"Sydney est la session la plus faible pour les paires majeures. Spreads larges, peu de volume. Attends Londres ou New York.",hintText:"Chaque actif a sa session de prédilection. EUR/USD brille sur Londres et NY, pas Sydney."},
+    {kind:"click-target",instruction:"Le prix de l'or est dans une session calme. Identifie le début de la grande impulsion (bougie qui marque clairement le pic de volatilité de la session New York).",candles:[{o:2010,h:2012,l:2009,c:2011},{o:2011,h:2013,l:2010.5,c:2011.5},{o:2011.5,h:2012.5,l:2011,c:2012},{o:2012,h:2012.8,l:2011.8,c:2012.2},{o:2012.2,h:2013,l:2012,c:2012.6},{o:2012.6,h:2013.2,l:2012.4,c:2012.8},{o:2012.8,h:2016.5,l:2012,c:2016},{o:2016,h:2019,l:2015.5,c:2018.5},{o:2018.5,h:2021,l:2018,c:2020},{o:2020,h:2022,l:2019.5,c:2021},{o:2021,h:2023,l:2020.5,c:2022.5},{o:2022.5,h:2023.5,l:2022,c:2023}],targets:[{id:"ny-open",priceMin:2012.5,priceMax:2020}],successText:"Exactement. Ce saut brusque après une période calme représente l'ouverture de New York.",hintText:"Cherche où de petites bougies calmes sont soudainement suivies d'une grosse bougie directionnelle."}
+  ]}
+};
+
+MODULE_CONTENT[3] = {
+  lesson:[
+    {type:"text",heading:"Le sol et le plafond du marché",body:"Imagine que le prix est une balle qui rebondit dans une pièce. Le support, c'est le sol : la balle tombe, touche le sol et remonte. La résistance, c'est le plafond : la balle monte, tape le plafond et redescend.\n\nUn support est un niveau de prix où la demande surpasse l'offre. Les acheteurs pensent que c'est une bonne affaire à ce niveau, ils entrent massivement, et le prix repart à la hausse.\n\nUne résistance est l'opposé : un niveau où l'offre surpasse la demande. Les vendeurs pensent que c'est trop cher et liquident leurs positions, faisant retomber le prix.\n\nRègle d'or : plus un niveau est testé et tenu, plus il est fort. Un support touché 4 fois sans être cassé est beaucoup plus puissant qu'un support touché une seule fois."},
+    {type:"text",heading:"L'inversion des rôles : le secret que la plupart ratent",body:"Voici le concept le plus important sur les S&R : quand un niveau est cassé franchement, les rôles s'inversent.\n\nUn support cassé devient une résistance. Après la cassure, le prix revient souvent tester ce même niveau par en dessous. Ce qui était un plancher devient un plafond.\n\nUne résistance cassée devient un support. Le prix revient tester le niveau par en dessus pour le valider avant de continuer.\n\nCe retest est crucial : c'est là que les traders avisés entrent avec le meilleur ratio risque/rendement. Pas à la cassure (trop risqué), pas loin du niveau (trop tard), mais au retest du niveau après inversion."},
+    {type:"text",heading:"Les lignes de tendance : la boussole du trader",body:"Une ligne de tendance relie les creux successifs en tendance haussière, ou les sommets successifs en tendance baissière. Elle montre la direction principale et agit comme support ou résistance dynamique.\n\nTendance haussière (uptrend) : le prix forme des Higher Highs et Higher Lows. Trace la ligne en dessous, en reliant les creux. C'est ton support dynamique.\n\nTendance baissière (downtrend) : le prix forme des Lower Highs et Lower Lows. Trace la ligne au-dessus, en reliant les sommets. C'est ta résistance dynamique.\n\nRègle des 3 points : une ligne de tendance nécessite minimum 2 points de contact, mais 3 points la rendent fiable et tradable."},
+    {type:"text",heading:"Les supports et résistances dynamiques : les moyennes mobiles",body:"Les moyennes mobiles (MA) agissent comme des S&R dynamiques qui suivent le prix en temps réel.\n\nMA 20 (court terme) : réactive aux mouvements récents, idéale pour le scalping.\nMA 50 (moyen terme) : support/résistance important respecté par la grande majorité des traders.\nMA 200 (long terme) : la ligne de vie du marché. Au-dessus = tendance haussière long terme. En dessous = baissière.\n\nDeath cross : MA50 passe sous la MA200. Signal baissier majeur.\nGolden cross : MA50 passe au-dessus de la MA200. Signal haussier majeur.\n\nSur XAUUSD en scalping : la MA50 sur H1 est souvent un niveau clé pour les rebonds intraday."},
+    {type:"text",heading:"Les 5 erreurs classiques sur les S&R (à éviter absolument)",body:"Dessiner des lignes partout. Garde seulement 2-3 niveaux forts par graphique. Un graphique surchargé de lignes ne sert à rien, tu finis par voir des signaux partout et nulle part.\n\nIgnorer le contexte de la cassure. Une cassure sans aucune accélération de momentum est souvent une fausse alerte qui se fait piéger rapidement.\n\nTrader contre la tendance générale. Un support qui tient sur M5 ne veut rien dire si la tendance H4 est clairement baissière et écrase tout sur son passage.\n\nPlacer le stop-loss pile sur la ligne. Le prix touche souvent exactement le niveau avant de repartir (c'est même normal, c'est le retest). Place ton stop avec un peu de marge au-delà du niveau, pas exactement dessus.\n\nPenser que le S&R fonctionne à 100% du temps. Rien n'est garanti en trading. Le S&R est une probabilité, pas une loi physique. Utilise toujours un stop-loss, peu importe la confiance que tu as dans le niveau."},
+    {type:"text",heading:"Ton plan d'action pour maîtriser les S&R",body:"La théorie seule ne suffit jamais. Voici l'exercice que je recommande à tous mes élèves débutants.\n\nÉtape 1 : Prends 3 actifs que tu connais bien (par exemple XAUUSD, EUR/USD, BTC/USD).\n\nÉtape 2 : Ouvre chacun en timeframe H1 ou H4.\n\nÉtape 3 : Dessine les supports et résistances des 3 derniers mois, en te limitant aux niveaux les plus évidents et les plus testés.\n\nÉtape 4 : Pour chaque niveau, note mentalement : 'Si le prix arrive ici, qu'est-ce que je ferais ?'\n\nÉtape 5 : Recommence cet exercice chaque semaine. En un mois, identifier les S&R deviendra un réflexe instantané, et tu auras déjà une longueur d'avance sur 90% des débutants qui sautent directement aux indicateurs compliqués sans maîtriser cette base."}
+,
+    {type:"text",heading:"Les patterns chartistes : lire les intentions du marché",body:"Un pattern chartiste, c'est une configuration visuelle que le prix répète de façon prévisible. Pas parce que c'est magique — mais parce que ce sont toujours les mêmes comportements humains (peur, cupidité, hésitation) qui se reproduisent.\n\nVoici les configurations essentielles à reconnaître :"},
+    {type:"text",heading:"Le Flag et le Pennant : la pause avant la continuation",body:"Après un mouvement fort (le mât), le prix marque une pause en formant un canal légèrement incliné contre le mouvement (flag) ou un triangle symétrique qui se resserre (pennant).\n\nCe que ça dit : les acheteurs (ou vendeurs) reprennent leur souffle avant de continuer dans la même direction. La cassure du flag dans le sens du mât est le signal d'entrée.\n\nEn optique SMC : cette 'pause' est souvent une zone de distribution pour les retail traders — les institutions accumulent discrètement pendant que le prix consolide."},
+    {type:"text",heading:"Les triangles : compression avant explosion",body:"Il existe 3 types de triangles :\n\n▸ Triangle ascendant — résistances plates, supports montants. Biais haussier.\n▸ Triangle descendant — supports plats, résistances descendantes. Biais baissier.\n▸ Triangle symétrique — compression pure. Le marché hésite. La cassure (dans n'importe quel sens) donne la direction.\n\nPlus le triangle est comprimé, plus le mouvement après la cassure sera violent. Les triangles sont des zones de manipulation : le prix teste souvent les deux côtés avant de se décider."},
+    {type:"text",heading:"La zone de consolidation : manipulation ou accumulation ?",body:"Quand le prix range (se déplace latéralement) entre deux niveaux clairs sans breakout franc, c'est une zone de consolidation.\n\nDeux scénarios possibles :\n\n1. Accumulation institutionnelle — les institutions achètent discrètement sans faire monter le prix trop vite. Quand c'est terminé, le move est explosif vers le haut.\n\n2. Distribution — les institutions vendent leurs positions à ceux qui achètent la 'consolidation'. Résultat : chute violente.\n\nComment distinguer ? Attends la cassure et observe où elle se passe. Une cassure haussière vers une zone de demande = accumulation. Une cassure baissière vers une zone d'offre = distribution."},
+    {type:"text",heading:"La cassure de tendance (Trendline Break) : le signal de retournement",body:"Une ligne de tendance se trace en reliant au minimum 2 points bas consécutifs (pour une tendance haussière) ou 2 points hauts (pour une baissière).\n\nUne cassure de trendline ne signifie pas automatiquement un retournement — c'est un avertissement. Ce que tu veux voir :\n\n▸ La cassure est franche, avec volume / momentum fort\n▸ Après la cassure, le prix reteste la trendline par en dessous (pull-back) et échoue à remonter\n▸ Ce retest t'offre l'entrée avec un risque minimal\n\nEn SMC : associe la cassure de trendline avec une BOS (Break of Structure) pour avoir un signal de haute qualité. Seul, le trendline break manque de contexte."}
+  ],
+  quiz:[
+    {q:"Un niveau de résistance est cassé à la hausse avec un gros volume. Que devient ce niveau ?",options:["Il reste une résistance","Il devient un nouveau support","Il n'a plus aucune signification","Il devient la cible du prochain mouvement"],correct:1,explain:"Inversion des rôles : résistance cassée = nouveau support. Les traders qui ont vendu à ce niveau achèteront au retest pour limiter leurs pertes."},
+    {q:"Pour tracer une ligne de tendance haussière valide, tu relies quels points ?",options:["Les sommets (highs) successifs","Les clôtures successives","Les creux (lows) successifs","Les points d'ouverture successifs"],correct:2,explain:"En uptrend, la ligne de tendance relie les creux (lows) successifs par en dessous. Elle représente le support dynamique."},
+    {q:"Quelle est l'erreur classique à éviter en plaçant ton stop-loss près d'un support ?",options:["Le placer trop loin du support","Le placer exactement pile sur la ligne du support","Ne jamais utiliser de stop-loss sur un support fort","Le placer au-dessus du prix d'entrée"],correct:1,explain:"Le prix touche souvent exactement le niveau avant de repartir, c'est le retest normal. Place ton stop avec une marge au-delà du niveau, pas pile dessus."},
+    {q:"La MA50 passe sous la MA200 sur un graphique daily. Quel signal cela représente-t-il ?",options:["Un golden cross, signal haussier","Un death cross, signal baissier majeur","Un signal neutre à ignorer","Un signal d'achat court terme"],correct:1,explain:"Death cross : MA50 sous MA200 = signal baissier majeur. Golden cross c'est l'inverse."},
+    {q:"Tu identifies un support testé 5 fois en 3 semaines. Que peux-tu déduire ?",options:["Le support va bientôt casser car trop sollicité","Le support est très fort et digne de confiance","C'est un faux support","Il n'est valide que jusqu'à 3 touches"],correct:1,explain:"Plus un niveau est testé et tenu, plus il est fort. 5 touches sans cassure = support très puissant."},
+    {q:"Le meilleur moment pour entrer après une inversion de rôles est :",options:["À la cassure de la résistance","Le plus loin possible du niveau","Au retest du niveau après l'inversion","Avant la cassure, en anticipant"],correct:2,explain:"Au retest : confirmation de l'inversion, price revient tester, tu entres avec un stop serré. Ratio risque/rendement optimal."},
+    {q:"Combien de niveaux de S&R devrait-on idéalement garder visibles sur un graphique ?",options:["Le plus possible, pour ne rien manquer","2-3 niveaux forts maximum","Exactement 10","Aucune limite n'est recommandée"],correct:1,explain:"Un graphique surchargé de lignes rend l'analyse confuse. Garde 2-3 niveaux forts et pertinents plutôt que de dessiner partout."},
+    {q:"Quelle est la règle minimale pour qu'une ligne de tendance soit fiable ?",options:["1 point de contact","2 points de contact minimum","5 points minimum","Uniquement les clôtures comptent"],correct:1,explain:"2 points minimum pour tracer, 3 points pour la rendre vraiment fiable et tradable."},
+    {q:"Après un fort mouvement haussier, le prix consolide dans un canal légèrement baissier. Quelle configuration reconnais-tu ?",options:["Un triangle descendant","Un flag haussier (bull flag)","Une zone de distribution","Un double top"],correct:1,explain:"C'est un flag haussier : le mât (fort mouvement) suivi d'une pause en canal légèrement incliné contre le trend. La cassure haussière du canal = signal de continuation."},
+    {q:"Dans un triangle symétrique, le prix compresse entre des highs descendants et des lows ascendants. Quelle est ton attitude avant la cassure ?",options:["Tu achètes car c'est haussier","Tu vends car c'est baissier","Tu attends la cassure pour suivre la direction","Tu ignores, ce pattern est peu fiable"],correct:2,explain:"Un triangle symétrique ne donne pas de biais directionnel — il indique une compression. Tu attends la cassure franche pour entrer dans la direction du mouvement."},
+    {q:"Le prix range entre deux niveaux clairs pendant 3 semaines, puis casse violemment à la baisse. En optique SMC, qu'est-ce qui s'est probablement passé pendant le range ?",options:["Accumulation institutionnelle","Distribution institutionnelle","Les retail ont tous vendu","Une pause technique sans signification"],correct:1,explain:"Distribution : les institutions vendaient discrètement leurs positions à ceux qui achetaient le range, anticipant le move baissier. La casse violente confirme la distribution."},
+    {q:"Une trendline haussière est cassée. Quelle combinaison donne le signal de retournement le plus fiable ?",options:["Cassure + retest échoué de la trendline","Cassure seule, entrer immédiatement","Cassure + RSI uniquement","Attendre 3 bougies de confirmation"],correct:0,explain:"La cassure seule peut être un faux signal. Le combo gagnant : cassure franche + pull-back sur la trendline qui devient résistance + clôture en dessous. En SMC, associe ça à une BOS pour plus de fiabilité."},
+    {q:"Quelle est la différence principale entre un flag et un pennant ?",options:["Le flag est baissier, le pennant est haussier","Le flag est un canal parallèle, le pennant est un triangle qui se resserre","Le flag dure plus longtemps que le pennant","Il n'y a pas de différence réelle"],correct:1,explain:"Flag = canal parallèle légèrement incliné contre le trend. Pennant = mini-triangle symétrique qui se comprime. Les deux signalent une pause avant continuation, mais leur forme est différente."}
+  ],
+  exercise:{steps:[
+    {kind:"click-target",instruction:"Ce graphique montre une ancienne résistance qui vient d'être cassée à la hausse, puis retestée. Clique sur la zone où ce niveau représente maintenant un SUPPORT (inversion des rôles).",candles:[{o:98,h:99,l:97,c:98.5},{o:98.5,h:100.5,l:98,c:99.5},{o:99.5,h:101,l:99,c:100},{o:100,h:101.5,l:99.5,c:101},{o:101,h:102,l:100.5,c:101.2},{o:101.2,h:103,l:101,c:102.5},{o:102.5,h:105.5,l:102,c:105},{o:105,h:107,l:104.5,c:106.5},{o:106.5,h:108,l:105.5,c:106},{o:106,h:107,l:104.5,c:105},{o:105,h:106,l:104.8,c:105.5},{o:105.5,h:106.5,l:105,c:106},{o:106,h:108,l:105.5,c:107.5},{o:107.5,h:109,l:107,c:108.5},{o:108.5,h:110,l:108,c:109.5},{o:109.5,h:111,l:109,c:110.5}],targets:[{id:"role-inv",priceMin:104.3,priceMax:106.3}],successText:"Parfait. L'ancienne résistance (~105) est cassée vers le haut, puis le prix revient la tester par en dessous — elle agit maintenant comme support.",hintText:"L'ancienne résistance se situe autour de 105. Après la cassure haussière, le prix fait un pullback vers ce niveau."},
+    {kind:"calc-input",instruction:"Un support majeur se situe à 2 580$ sur XAUUSD. Le prix actuel est à 2 620$. Si le support tient et que le prix repart à la hausse, calcule la cible minimale avec cette règle simple : la cible = prix actuel + (distance jusqu'au support × 1.5). (× 1.5 = on multiplie par 1.5 pour projeter un mouvement d'au moins 1.5 fois la distance entre le prix et le support.)",given:[{label:"Prix actuel",value:"2 620 $"},{label:"Support (plancher)",value:"2 580 $"},{label:"Distance (2 620 - 2 580)",value:"= 40 $"},{label:"Calcul de la cible",value:"2 620 + (40 × 1.5) = 2 620 + 60 = ?"}],correctAnswer:2680,tolerance:5,unit:"$",successText:"Parfait ! 2 620 + (40 × 1.5) = 2 620 + 60 = 2 680$. Cette méthode simple te donne une cible minimale réaliste : si le support tient, le prix peut au moins faire 1.5 fois la distance qu'il vient de parcourir.",hint:"40 × 1.5 = 60, puis 2 620 + 60 = ?"}
+  ]}
+};
+
+MODULE_CONTENT[4] = {
+  lesson:[
+    {type:"text",heading:"Swing High et Swing Low : les briques de la structure",body:"Un swing high est un sommet local : une bougie entourée de deux bougies avec des highs plus bas. C'est un pic visible où le prix a monté puis est redescendu.\n\nUn swing low est l'inverse : un creux local entouré de deux bougies avec des lows plus hauts. C'est un fond visible où le prix est descendu puis est remonté.\n\nCes swings définissent la structure du marché :\nHigher High (HH) + Higher Low (HL) = tendance haussière\nLower High (LH) + Lower Low (LL) = tendance baissière"},
+    {type:"text",heading:"Accumulation, Manipulation, Distribution (AMD)",body:"C'est le cycle que les institutions utilisent pour prendre leurs positions. Une fois que tu le vois, tu le retrouves partout.\n\nAccumulation : phase de range, les institutions accumulent discrètement. Peu de direction, petites bougies, mouvement latéral.\n\nManipulation : les institutions poussent le prix dans la mauvaise direction pour casser les stops des traders retail. Un false breakout sous un support (stop hunt baissier) ou au-dessus d'une résistance (stop hunt haussier).\n\nDistribution : après la manipulation, le prix repart dans la vraie direction, souvent avec force. Les institutions distribuent leurs profits."},
+    {type:"text",heading:"La méthode top-down : toujours commencer par le grand tableau",body:"La règle la plus importante : commence toujours par le timeframe le plus élevé et descends progressivement.\n\nÉtape 1 — H4 : Identifie la tendance principale. Trace les grandes lignes de tendance. Repère les zones de liquidité importantes.\n\nÉtape 2 — H1 : Affine ton analyse. Marque les niveaux clés récents. Confirme que la tendance H4 est intacte.\n\nÉtape 3 — M15/M5 : Cherche ton entrée. Ne trade que dans le sens de la tendance H4.\n\nPourquoi ? Tu évites 80% des trades perdants qui vont contre la tendance. Et tu places stops et cibles sur des niveaux logiques."},
+    {type:"text",heading:"La méthode d'identification de tendance Sam",body:"Voici ma technique personnelle utilisée quotidiennement sur XAUUSD.\n\nAprès une hausse importante : le prix fait souvent une accumulation à la baisse (consolidation calme, petites bougies, sans gros volume). Ce n'est pas un retournement, c'est une pause. Dans ~80% des cas, cette accumulation est suivie d'une nouvelle cassure haussière.\n\nAprès une chute importante : le prix fait souvent une accumulation à la hausse (pullback calme). Et dans ~80% des cas, cette accumulation est suivie d'une nouvelle cassure baissière.\n\nDifférencier accumulation vs retournement : accumulation = bougies petites, range serré, pas de cassure de structure majeure. Retournement = grande bougie impulsive, cassure franche d'un swing clé, volume élevé."},
+    {type:"text",heading:"Identifier précisément un swing high et un swing low",body:"En pratique, un swing high se confirme par 3 bougies minimum : la bougie centrale a un high plus élevé que la bougie qui la précède ET que la bougie qui la suit. C'est la définition technique précise.\n\nUn swing low fonctionne pareil mais à l'inverse : la bougie centrale a un low plus bas que ses deux voisines.\n\nEn pratique sur un graphique réel, plus tu zoomes (timeframe bas), plus tu vas trouver de petits swings sans grande importance. C'est pour ça que l'analyse de structure doit toujours se faire en gardant en tête le timeframe de référence : un swing high sur M1 n'a presque aucune importance, mais un swing high sur H4 ou Daily est un niveau de liquidité majeur que le marché va probablement revisiter.\n\nQuand un nouveau Higher High se forme après un Higher Low, la tendance haussière se confirme structure par structure. Le jour où un Lower Low apparaît à la place d'un nouveau Higher Low, c'est le premier signal d'alarme qu'un changement de structure (potentiel retournement) pourrait être en cours."},
+    {type:"text",heading:"Le changement de caractère (Change of Character)",body:"Le Change of Character, ou CHoCH, est le signal le plus précoce qu'une tendance pourrait changer de direction.\n\nDans une tendance haussière établie (HH/HL), un CHoCH se produit quand le prix casse sous le dernier Higher Low. Cette cassure brise la structure haussière et signale que les vendeurs ont potentiellement repris le contrôle.\n\nDans une tendance baissière établie (LH/LL), un CHoCH se produit quand le prix casse au-dessus du dernier Lower High.\n\nImportant : un CHoCH n'est pas une garantie de retournement complet. C'est un signal d'alerte qui te dit de réduire ton biais directionnel précédent et de chercher une confirmation supplémentaire (nouvelle structure HH/HL ou LH/LL) avant de retourner ta position complètement. Beaucoup de traders combinent le CHoCH avec les zones de liquidité et les Order Blocks pour confirmer un vrai retournement plutôt qu'un simple pullback."}
+  ],
+  quiz:[
+    {q:"Un graphique montre HH → HL → HH → HL. Quelle est la structure de marché ?",options:["Baissière","Neutre (range)","Haussière","Manipulation institutionnelle"],correct:2,explain:"HH + HL + HH + HL = tendance haussière claire."},
+    {q:"Dans le modèle AMD, que se passe-t-il lors de la phase de Manipulation ?",options:["Les institutions distribuent leurs profits sur le grand mouvement","Le prix range latéralement sans bouger","Les grandes banques poussent le prix dans la mauvaise direction pour déclencher les stop-loss des petits traders (les 'retail' = toi et moi)","Le prix repart immédiatement dans la vraie direction"],correct:2,explain:"La manipulation est le faux breakout (fausse cassure) : les institutions poussent le prix dans la mauvaise direction pour déclencher les stop-loss des petits traders. Elles récupèrent ainsi de la liquidité à bon prix, puis repartent dans la vraie direction."},
+    {q:"Qu'est-ce qu'un Change of Character (CHoCH) dans une tendance haussière ?",options:["Une nouvelle bougie verte qui confirme la hausse","Le prix casse sous le dernier Higher Low, signal d'alerte de retournement potentiel","Un simple pullback normal sans signification","Une accumulation classique"],correct:1,explain:"Le CHoCH en tendance haussière survient quand le prix casse sous le dernier Higher Low. C'est le premier signal d'alerte qu'un changement de structure pourrait être en cours."},
+    {q:"Tu vois un superbe setup baissier sur M5. Mais sur H4, la tendance est clairement haussière. Que fais-tu ?",options:["Tu prends le trade, le M5 est plus précis","Tu ignores le trade, il va contre la tendance H4","Tu prends une demi-position","Tu attends la confirmation M15"],correct:1,explain:"Ne jamais trader contre la tendance H4. Le M5 baissier dans une tendance H4 haussière, c'est juste un pullback."},
+    {q:"Après une grosse chute sur XAUUSD, tu observes une consolidation calme avec de petites bougies à la hausse. Selon la méthode Sam, que prévoient statistiquement les ~80% des cas ?",options:["Une continuation haussière","Une nouvelle chute après cette accumulation haussière","Un range prolongé","Un breakout aléatoire"],correct:1,explain:"Accumulation à la hausse après une chute = pullback calme. Dans ~80% des cas, le mouvement baissier reprend."},
+    {q:"Quelle est la première étape obligatoire dans l'analyse top-down ?",options:["Identifier l'entrée sur M5","Chercher les FVG sur M1","Analyser la tendance sur H4 d'abord","Regarder les niveaux daily"],correct:2,explain:"Top-down = commencer par le haut. H4 d'abord pour la tendance principale."},
+    {q:"Sur quel timeframe un swing high est-il généralement le plus significatif pour ton analyse ?",options:["M1, le plus précis","H4 ou Daily, des niveaux de liquidité majeurs","Peu importe le timeframe, tous sont équivalents","Seulement sur le timeframe d'entrée"],correct:1,explain:"Plus le timeframe est élevé, plus le swing high représente un niveau de liquidité significatif que le marché est susceptible de revisiter. Un swing sur M1 est presque insignifiant."},
+    {q:"Qu'est-ce qui différencie principalement une accumulation d'un vrai retournement ?",options:["La durée","L'heure de la journée","La violence et le volume : retournement = grosse bougie impulsive, cassure de structure","La paire tradée"],correct:2,explain:"Retournement = grande bougie impulsive, cassure franche d'un swing clé, volume élevé. Accumulation = petites bougies, range serré, pas de cassure."}
+  ],
+  exercise:{steps:[
+    {kind:"click-target",instruction:"Ce graphique montre une grande impulsion suivie d'une accumulation puis d'une continuation. Identifie la zone d'ACCUMULATION (là où les bougies sont petites et le range serré).",candles:[{o:100,h:102,l:99,c:101.5},{o:101.5,h:103,l:101,c:102.5},{o:102.5,h:105,l:102,c:104.5},{o:104.5,h:107,l:104,c:106.5},{o:106.5,h:109,l:106,c:108},{o:108,h:109.5,l:107.5,c:108.8},{o:108.8,h:109.5,l:108.2,c:108.5},{o:108.5,h:109.3,l:108,c:108.8},{o:108.8,h:109.6,l:108.3,c:108.4},{o:108.4,h:109.2,l:108.1,c:109},{o:109,h:109.8,l:108.6,c:108.7},{o:108.7,h:109.4,l:108.4,c:109.2},{o:109.2,h:112,l:109,c:111.5},{o:111.5,h:114,l:111,c:113},{o:113,h:116,l:112.5,c:115.5},{o:115.5,h:118,l:115,c:117}],targets:[{id:"accum",priceMin:107.5,priceMax:110}],successText:"Parfait. Les bougies 6 à 12 forment une consolidation serrée après la hausse initiale. C'est l'accumulation, suivie de la continuation.",hintText:"Cherche la zone où les bougies sont toutes petites et proches les unes des autres, coincées dans un petit range."},
+    {kind:"choice",instruction:"Tu es sur le graphique 1H de XAUUSD. La tendance sur 4H est haussière. Sur 1H tu vois une structure LH → LL → LH → LL (Lower High = sommet de plus en plus bas, Lower Low = creux de plus en plus bas). Comment interprètes-tu ce mouvement ?",options:["La tendance H4 se retourne, je vends","C'est un pullback dans la tendance H4 haussière, je cherche un achat sur le prochain support","Le signal H1 est plus fort que H4, je vends","Les deux timeframes se contredisent trop"],correctIndex:1,successText:"Exactement. LH/LL sur H1 dans une tendance haussière H4 = pullback normal. Attends le support suivant pour acheter dans le sens de la tendance H4.",hintText:"La tendance H4 domine toujours. Un pullback H1 est une opportunité d'entrée, pas un signal de vente."}
+  ]}
+};
+
+MODULE_CONTENT[5] = {
+  lesson:[
+    {type:"text",heading:"Pourquoi les institutions laissent des traces",body:"Les banques, fonds et institutions ne peuvent pas acheter ou vendre discrètement. Leurs volumes sont trop énormes. Quand elles placent des millions de lots, elles créent des empreintes visibles sur le graphique. Ces empreintes, c'est ce qu'on appelle les Smart Money Concepts (SMC).\n\nIl ne s'agit pas de magie. C'est simple : un gros acheteur qui place 10 000 lots doit les répartir sur plusieurs niveaux. Ces zones restent visibles et le prix les respecte souvent.\n\nAttention : ICT, SMC et order blocks sont devenus très populaires. Les institutions le savent. Elles manipulent parfois ces niveaux pour chasser les stops. N'utilise jamais un concept aveuglément — prends-le comme une information dans un contexte plus large."},
+    {type:"text",heading:"Fair Value Gap (FVG) : l'espace que le marché veut combler",body:"Un FVG est un écart non comblé entre les bougies, créé quand le marché monte ou descend trop vite.\n\nFVG Bullish : 3 bougies consécutives où le low de la 3ème est plus haut que le high de la 1ère. L'espace vide entre elles = le FVG. Le prix a sauté cet espace à la hausse.\n\nFVG Bearish : l'inverse — le high de la 3ème est plus bas que le low de la 1ère.\n\nPourquoi le prix revient ? Le marché cherche l'équilibre. Ces gaps représentent des zones où les ordres n'ont pas été complètement exécutés.\n\nComment trader : attends que le prix revienne dans le FVG. Cherche une entrée dans la direction de la tendance principale. Stop loss au-delà du FVG. Les FVG sur H4 et Daily sont plus fiables que sur M1."},
+    {type:"text",heading:"Order Block (OB) : la zone des décisions institutionnelles",body:"Un Order Block est la dernière bougie avant un mouvement impulsif. C'est là que les institutions ont placé massivement leurs ordres.\n\nOB Bullish : dernière bougie rouge (baissière) avant un grand mouvement haussier. Zone de demande institutionnelle.\nOB Bearish : dernière bougie verte (haussière) avant un grand mouvement baissier. Zone d'offre institutionnelle.\n\nLe retest : après le mouvement explosif, le prix revient souvent réactiver l'OB. C'est ton signal d'entrée.\n\nImportant : un OB retesté plusieurs fois perd sa force. Privilégie les OB frais (un seul retest maximum)."},
+    {type:"text",heading:"Liquidity Zones : là où les stops s'accumulent",body:"Les zones de liquidité sont des niveaux où se concentrent les stop-loss des traders retail. Les institutions les connaissent et les chassent.\n\nOù se trouvent-elles ? Aux derniers swing highs non testés (stops des shorts au-dessus). Aux derniers swing lows non testés (stops des longs en dessous). Aux niveaux ronds (2 000$, 2 050$).\n\nComment les institutions chassent : elles poussent le prix juste au-delà de ces niveaux, déclenchent les stops, récupèrent la liquidité, puis repartent dans la vraie direction.\n\nCombinaison ultime : OB + FVG dans une zone de liquidité = confluence maximale = setup à plus haute probabilité."},
+    {type:"text",heading:"Les patterns Flag : le pattern du gold",body:"Le XAUUSD forme très souvent des flags (drapeaux). C'est le pattern que tu vas trader le plus souvent.\n\nBull Flag : après une hausse forte (le mât), le prix consolide en baissant légèrement dans un canal descendant (le drapeau). Structure interne : lower highs, lower lows. Mais la vraie tendance est haussière. Ce pullback calme = opportunité d'achat.\n\nBear Flag : après une chute forte, le prix consolide en montant légèrement. Structure interne : higher highs, higher lows. Ce pullback calme = opportunité de vente.\n\nMon entrée : je n'attends pas la cassure du flag. J'entre le plus tôt possible dans le drapeau, sur un niveau de support/résistance clair à l'intérieur, avec un stop serré. Meilleur ratio risque/rendement."},
+    {type:"text",heading:"Comment combiner les 3 concepts SMC dans une vraie stratégie",body:"Voici les 3 scénarios concrets que j'utilise pour construire un setup à haute probabilité.\n\nScénario 1 — Remplissage de FVG + Order Block : le prix crée un FVG, puis revient le remplir. Tu identifies un Order Block dans cette même zone. Tu entres au retest de l'OB avec confirmation (bougie de rejet). Stop loss au-delà du FVG complet.\n\nScénario 2 — Chasse de liquidité + retest OB : les institutions chassent une zone de liquidité (flush des stops). Après le flush, le prix reteste l'Order Block le plus proche. C'est ton signal d'entrée pour suivre la direction institutionnelle.\n\nScénario 3 — FVG + Liquidity combo : un FVG se forme directement à une zone de liquidité. C'est un double intérêt institutionnel sur la même zone. Attends le retest pour entrer avec une forte probabilité de réussite.\n\nConseils pratiques : visualise toujours tes FVG et OB sur des timeframes plus larges (H4, Daily) pour plus de fiabilité. Les zones de liquidité les plus puissantes sont les highs/lows non testés des jours précédents. Attends TOUJOURS le retest de la zone avant d'entrer, jamais d'anticipation. Un OB retesté plusieurs fois perd sa force, privilégie les OB frais."},
+    {type:"text",heading:"Pourquoi il n'y a pas de technique magique",body:"Il faut être honnête sur un point : il n'existe pas de technique magique en trading, peu importe ce que tu vois sur YouTube ou Telegram. ICT, SMC, order blocks, FVG, breaker blocks, liquidity grabs — ces concepts ne sont pas du vent, mais ils sont devenus un business, et beaucoup de traders retail se font piéger en les suivant aveuglément.\n\nPourquoi ? Parce que les institutions connaissent ces concepts aussi bien que toi. Elles savent que des milliers de retail traders cherchent les mêmes order blocks et les mêmes FVG. Elles manipulent parfois exprès ces niveaux : stop hunting, faux breakouts, puis vraie direction.\n\nLe trader retail qui suit bêtement les concepts sans les combiner avec son propre jugement se fait sortir 3-4 fois sur 5, même s'il maîtrise parfaitement la théorie.\n\nLe marché récompense ceux qui développent LEUR propre façon de combiner ces outils, pas ceux qui copient une recette publique. Utilise les SMC comme une des couches de ton analyse, jamais comme l'unique raison d'entrer sur un trade. Combine-les toujours avec la structure de marché et le contexte macro."}
+  ],
+  quiz:[
+    {q:"Pour identifier un FVG Haussier (Bullish FVG), tu regardes 3 bougies à la suite. Laquelle de ces conditions crée un vide (espace vide) entre la 1ère et la 3ème bougie ?",options:["La clôture de la 2ème bougie est plus haute que l'ouverture de la 1ère","Le bas (Low) de la 3ème bougie est plus haut que le haut (High) de la 1ère — il y a un vide entre elles","Le haut de la 3ème bougie est plus bas que le bas de la 1ère","Les 3 bougies sont toutes vertes"],correct:1,explain:"FVG Haussier = le bas de la bougie 3 est PLUS HAUT que le haut de la bougie 1. Il reste un espace vide entre elles que le prix n'a pas rempli. Imagine un ascenseur qui monte si vite qu'il saute plusieurs étages d'un coup — ces étages manquants, c'est le FVG."},
+    {q:"Un Order Block Bullish est :",options:["La première bougie verte d'une tendance","La dernière bougie rouge (baissière) juste avant un grand mouvement haussier","Une zone de résistance horizontale","Le gap entre deux grandes bougies vertes"],correct:1,explain:"L'OB Bullish est la dernière bougie baissière AVANT le mouvement haussier explosif."},
+    {q:"Pourquoi les grandes banques et institutions manipulent-elles parfois volontairement les zones SMC populaires ?",options:["Elles ne connaissent pas ces concepts","Elles savent que les petits traders (comme toi et moi) suivent ces niveaux et en profitent pour les piéger avant de repartir dans la vraie direction","C'est interdit par la régulation","Cela n'arrive jamais en réalité"],correct:1,explain:"Les grandes institutions connaissent ICT/SMC aussi bien que les petits traders. Elles poussent parfois le prix exprès au-delà de ces niveaux populaires (stop hunting, faux breakouts) pour déclencher les stops des petits traders avant de partir dans la vraie direction."},
+    {q:"Tu identifies une zone de liquidité juste au-dessus d'un swing high récent. Le prix approche. Que prévois-tu probablement ?",options:["Le prix s'arrête exactement au swing high","Le prix casse le swing high, chasse les stops des shorts, puis potentiellement rechute","Le prix monte indéfiniment","La zone n'a pas d'impact"],correct:1,explain:"Stop hunt classique : le prix dépasse brièvement le sommet pour déclencher les stops des personnes qui avaient parié sur une baisse (appelés les 'shorts'), puis revient rapidement dans le range. Les institutions ont récupéré leur liquidité."},
+    {q:"Un Order Block est retesté 3 fois. Que dois-tu en penser ?",options:["Il est encore plus fort","Il est affaibli et moins fiable","3 retests = retournement","Ça ne change rien"],correct:1,explain:"Un OB retesté plusieurs fois perd sa force. Les ordres institutionnels ont été absorbés. Privilégie les OB frais."},
+    {q:"Dans le scénario 'Chasse de liquidité + retest OB', quelle est la bonne séquence ?",options:["Le retest de l'OB se produit d'abord, puis la chasse de liquidité","La chasse de liquidité d'abord (le prix dépasse un niveau pour déclencher les stops = le 'flush'), puis le retest de l'OB le plus proche comme signal d'entrée","Les deux se produisent en même temps, sans ordre précis","Un FVG se forme d'abord, puis la chasse de liquidité"],correct:1,explain:"Séquence : 1) La chasse de liquidité (le 'flush') — le prix dépasse un niveau clé pour déclencher les stops des traders. 2) Après ce flush, le prix reteste l'Order Block le plus proche. C'est là que tu entres pour suivre la vraie direction."},
+    {q:"Dans un Bull Flag, comment reconnaît-on le drapeau ?",options:["Une grande bougie verte suivie d'une pause","Un canal ou triangle descendant calme après une hausse impulsive","Une résistance horizontale","Un FVG bullish"],correct:1,explain:"Bull Flag = grande hausse (mât) suivie d'une consolidation en canal descendant calme (drapeau)."},
+    {q:"Quelle combinaison d'outils donne le setup à plus haute probabilité ? (La 'confluence' = plusieurs raisons différentes de penser que le prix va réagir à un niveau. Plus tu as de raisons = plus c'est probable.)",options:["MA50 + MA200 + volume élevé","Order Block + FVG dans une zone de liquidité (3 raisons institutionnelles en même temps)","Résistance + support horizontal + bougie d'inversion","Deux bougies marteau consécutives"],correct:1,explain:"Confluence maximale = quand un Order Block, un FVG ET une zone de liquidité se trouvent au même endroit. Tu as 3 raisons institutionnelles de penser que le prix va réagir là. Plus il y a de confluence, plus la probabilité est élevée. C'est le setup le plus solide en SMC."}
+  ],
+  exercise:{steps:[
+    {kind:"click-target",instruction:"Ce graphique montre une impulsion haussière qui a créé un FVG. Clique sur la zone du FVG Bullish (l'espace vide que le marché n'a pas rempli lors de la montée rapide).",candles:[{o:100,h:101,l:99.5,c:100.5},{o:100.5,h:101.5,l:100,c:101},{o:101,h:102,l:100.5,c:101.5},{o:101.5,h:102.5,l:101,c:102},{o:102,h:102.8,l:101.5,c:102.3},{o:102.3,h:103,l:102,c:102.8},{o:102.8,h:107.5,l:102.5,c:107},{o:107,h:109,l:106.5,c:108.5},{o:108.5,h:110,l:108,c:109.5},{o:109.5,h:111,l:108.5,c:109},{o:109,h:110,l:107,c:107.5},{o:107.5,h:108.5,l:106.5,c:107},{o:107,h:108,l:106,c:107.2},{o:107.2,h:109,l:107,c:108.5},{o:108.5,h:110.5,l:108,c:110},{o:110,h:112,l:109.5,c:111.5}],targets:[{id:"fvg",priceMin:103,priceMax:106.5}],successText:"Parfait. La grande bougie est montée de ~102.8 à ~107 sans remplir l'espace 103-106.5 — c'est le FVG. Le prix est revenu le tester avant de repartir.",hintText:"Le FVG est l'espace VIDE entre le high de la bougie avant l'impulsion et le low de la bougie après. Cherche où le prix a sauté brutalement."},
+    {kind:"click-target",instruction:"Identifie l'Order Block Bullish : la dernière bougie rouge (baissière) juste avant le grand mouvement haussier explosif.",candles:[{o:200,h:202,l:199,c:200.5},{o:200.5,h:202,l:199.5,c:201},{o:201,h:203,l:200.5,c:201.5},{o:201.5,h:202.5,l:200,c:201},{o:201,h:201.8,l:199.5,c:200},{o:200,h:200.5,l:198.5,c:199},{o:199,h:199.8,l:198,c:198.5},{o:198.5,h:199.5,l:197.5,c:198},{o:198,h:199,l:197,c:197.5},{o:197.5,h:198,l:197,c:198.5},{o:198.5,h:206,l:198,c:205},{o:205,h:208,l:204.5,c:207},{o:207,h:210,l:206.5,c:209},{o:209,h:212,l:208.5,c:211},{o:211,h:214,l:210.5,c:213},{o:213,h:216,l:212.5,c:215}],targets:[{id:"ob",priceMin:197,priceMax:199}],successText:"Exactement. Les bougies 7-9 sont les dernières bougies baissières avant l'explosion haussière. C'est l'Order Block Bullish.",hintText:"Trouve la toute dernière bougie rouge juste AVANT la grande bougie verte impulsive."},
+    {kind:"choice",instruction:"XAUUSD vient de chuter fortement — c'est le mât du drapeau (la grande bougie ou série de bougies qui donne son élan au pattern). Le prix consolide maintenant en remontant légèrement dans un canal montant, formant des sommets de plus en plus hauts et des creux de plus en plus hauts à l'intérieur du canal. Quel pattern est-ce et quelle est ta stratégie ?",options:["Bull Flag — j'achète au sommet du canal","Bear Flag — j'entre en vente le plus haut possible dans le canal, avant la cassure baissière","Bear Flag — j'attends la cassure haussière pour acheter","Aucun pattern reconnaissable ici"],correctIndex:1,successText:"Exactement. C'est un Bear Flag : la structure interne (higher highs, higher lows) est haussière, mais la vraie tendance reste baissière. Entrer en vente le plus haut possible dans le canal offre le meilleur ratio risque/rendement, sans attendre la cassure.",hintText:"Une chute forte suivie d'une consolidation qui remonte légèrement = Bear Flag. La continuation attendue est baissière, pas haussière."}
+  ]}
+};
+
+MODULE_CONTENT[6] = {
+  lesson:[
+    {type:"text",heading:"80% mental, 20% technique",body:"Si tu retiens une seule chose de toute cette formation : le trading est 80% dans ta tête et 20% dans tes graphiques.\n\nTu peux avoir la meilleure stratégie du monde. Si tu déplaces ton stop parce que tu espères que le prix revienne, si tu doubles ta mise après une perte pour te refaire, si tu sautes sans setup par FOMO — ta stratégie vaut zéro.\n\nLes pires ennemis : la peur (couper les gains trop tôt), l'avidité (tenir trop longtemps), la frustration et le revenge trading (prendre de mauvais trades pour récupérer une perte)."},
+    {type:"text",heading:"La règle d'or : jamais plus de 1-2% de risque par trade",body:"C'est LA règle. Pas négociable, pas flexible.\n\nSi tu risques 1% par trade, il te faut 100 pertes consécutives pour vider ton compte. Une série de 10 défaites ne te coûte que ~9.5%. Tu peux survivre, analyser, et revenir.\n\nCalcul de taille de position :\n1. Décide ton stop-loss en dollars\n2. Capital × 1% = risque en dollars (ex. 10 000$ × 1% = 100$)\n3. 100$ ÷ valeur du stop = nombre de lots\n\nExemple XAUUSD : compte 10 000$, risque 1% = 100$. Stop à 20 pips. 1 pip = 1$ sur 0.01 lot. 100$ ÷ 20 = 0.05 lot maximum."},
+    {type:"text",heading:"Les erreurs qui détruisent les comptes",body:"Déplacer le stop-loss parce que 'ça va revenir' : tu transformes un risque calculé en risque illimité. La plupart des catastrophes commencent là.\n\nDoubler la mise après une perte (Martingale) : ça marche quelques fois. Puis une série de 5-6 pertes et tu perds 50% du compte en une session.\n\nTrader sans plan écrit : entrée, stop, cible. Si ce n'est pas écrit avant d'entrer, c'est du jeu.\n\nVenger une perte (revenge trading) : tu perds, l'émotion monte, tu reprends immédiatement sans setup. Tu perds encore plus.\n\nGonfler la taille après un bon trade : le marché se fout de ta bonne passe. Le risque reste 1-2%, toujours."},
+    {type:"text",heading:"Construire son journal de trading",body:"Le journal de trading est l'outil le plus sous-estimé. Les pros le savent. Les débutants l'ignorent.\n\nQu'est-ce qu'on note ? La raison d'entrée (quel setup, quelle confluence). Le stop-loss placé. La taille de position et le risque en dollars. La sortie et le résultat. Les émotions ressenties avant, pendant et après.\n\nAprès quelques semaines, tu vas voir des patterns : 'Chaque fois que j'entre après 14h, je perds.' 'Après trois pertes consécutives, je prends de mauvais trades.' Ces insights valent infiniment plus que n'importe quel indicateur.\n\nMindset pro : une perte = coût normal d'opération. Un gain = exécution correcte du process. L'objectif = exécuter correctement 100 trades, pas avoir raison sur ce trade-ci."},
+    {type:"text",heading:"Le test du mental solide : apprendre en pratique",body:"La théorie seule ne forge jamais un trader. C'est la pratique répétée, avec de vraies émotions en jeu (même en démo), qui construit la vraie discipline.\n\nLa stratégie recommandée pour débuter : commence simplement avec supports, résistances, lignes de tendance et cassures. Pas besoin de setups compliqués au départ. Trade avec ça, note tout, et observe-toi sans jugement.\n\nQuestions d'auto-analyse à te poser après chaque session : Quand j'ai perdu, est-ce que je cherche directement un revenge trade ? Quand j'ai gagné, est-ce que je gonfle la taille du trade suivant ? Quelles faiblesses reviennent le plus souvent (peur de rater, peur de perdre, avidité) ? Est-ce que je respecte mon plan même quand ça chauffe ?\n\nIl est normal de devoir refaire ce travail d'introspection plusieurs fois. C'est le meilleur apprentissage possible : apprendre la théorie c'est une chose, mais apprendre en pratique sur un compte démo, c'est complètement différent et bien plus puissant, car ça touche directement tes émotions réelles."},
+    {type:"text",heading:"Mon mantra personnel",body:"Voici l'état d'esprit que j'essaie de maintenir à chaque session, et que je te recommande d'adopter.\n\nJe suis OK pour perdre mes 1-2%. C'est le coût d'opération normal de ce métier, pas un échec personnel.\n\nMon job est d'exécuter mon plan, pas d'avoir raison sur chaque trade individuel. Un trade perdant exécuté selon le plan est un succès du processus, même s'il est financièrement négatif.\n\nUne perte est un coût normal, pas un drame. La régularité dans l'exécution tue l'émotion, trade après trade, jour après jour.\n\nLa discipline bat le talent tous les jours de la semaine. Respecte ton plan, respecte ton risque maximum par trade, et laisse le marché faire son travail. Gestion du risque stricte plus mental discipliné, c'est 80% du problème du trading déjà réglé avant même de parler de stratégie technique."}
+  ],
+  quiz:[
+    {q:"Tu as un compte de 5 000$. Ton stop-loss est à 25 pips (1 pip = le plus petit mouvement de prix). Sur XAUUSD, 0.01 lot (la plus petite taille de position) vaut environ 1$ par pip. Quel lot maximum pour ne risquer que 1% de ton compte ?",options:["0.01 lot","0.02 lot","0.05 lot","0.10 lot"],correct:1,explain:"Étape 1 : 1% de 5 000$ = 50$ (c'est le montant maximum que tu peux perdre). Étape 2 : ton stop est à 25 pips, et chaque pip vaut 1$ avec 0.01 lot. Étape 3 : 50$ ÷ 25 pips = 2 → tu peux prendre 2 fois 0.01 lot = 0.02 lot."},
+    {q:"Tu perds 3 trades consécutifs. L'envie de prendre un gros trade pour tout récupérer est :",options:["Une bonne idée si le setup est parfait","Du revenge trading, une des erreurs les plus destructrices","Acceptable si tu n'as pas tradé depuis 24h","Normal et recommandé"],correct:1,explain:"Le revenge trading est émotionnel, pas rationnel. La perte précédente ne change pas la qualité du prochain setup."},
+    {q:"Quelle stratégie technique est recommandée pour débuter le 'test du mental solide' ?",options:["Toutes les confluences SMC en même temps","Supports, résistances, lignes de tendance et cassures, sans setups compliqués","Uniquement le scalping sur M1","Attendre d'être expert avant de pratiquer"],correct:1,explain:"Pas besoin de setups compliqués au départ. Les bases (S&R, tendance, cassures) suffisent pour commencer à pratiquer et observer ses réactions émotionnelles."},
+    {q:"Pourquoi noter ses émotions dans un journal de trading ?",options:["C'est une obligation réglementaire","Pour identifier des patterns comportementaux qui impactent tes performances","Pour partager avec la communauté","Seuls les chiffres comptent"],correct:1,explain:"Après des semaines de journal, tu identifies tes propres biais : les heures où tu perds, les situations qui te font prendre de mauvaises décisions."},
+    {q:"Ton trade est en perte et approche de ton stop. Tu penses 'ça va revenir'. Que fais-tu ?",options:["Déplace le stop plus bas","Respecte ton stop comme prévu à l'entrée","Laisse le trade ouvert sans stop","Ajoute une position pour moyenner"],correct:1,explain:"Le plan original dit 'stop ici', le stop reste là. Déplacer le stop émotionnellement, c'est transformer un risque calculé en risque illimité."},
+    {q:"Qu'est-ce que le FOMO en trading ?",options:["Une stratégie basée sur les fondamentaux","Fear Of Missing Out : entrer sans setup par peur de rater un mouvement","Un indicateur de volatilité","Une règle de gestion du risque"],correct:1,explain:"FOMO = Fear Of Missing Out. Tu vois le prix monter fort, tu te jettes dedans sans setup, tu achètes au sommet. Responsable de beaucoup de mauvais trades."},
+    {q:"Selon le mantra du trader discipliné, l'objectif principal de chaque trade est :",options:["D'avoir raison sur la direction du marché","D'exécuter correctement le plan, peu importe le résultat financier individuel","De maximiser le profit à tout prix","De prouver sa compétence aux autres traders"],correct:1,explain:"Le job du trader est d'exécuter son plan, pas d'avoir raison sur chaque trade individuel. Un trade perdant bien exécuté selon le plan reste un succès du processus."},
+    {q:"L'avantage mathématique de risquer 1% maximum par trade est :",options:["Tu doubles plus vite","Il te faudrait ~100 pertes consécutives pour vider le compte","Les courtiers donnent de meilleurs spreads","Tu as moins besoin d'analyser"],correct:1,explain:"1% par trade = survie garantie. Une série de 10 pertes ne coûte que ~9.5%. Tu peux analyser et corriger."}
+  ],
+  exercise:{steps:[
+    {kind:"calc-input",instruction:"Calcule la taille de position. Compte : 10 000$. Risque : 1%. Stop-loss : 30 pips. Sur XAUUSD, 0.01 lot = 1$/pip (pip = le plus petit mouvement de prix, lot = la taille de ta position). Quel est le nombre de lots maximum ? (Arrondir vers le bas)",given:[{label:"Étape 1 — Capital",value:"10 000 $"},{label:"Étape 2 — Risque max (1%)",value:"10 000 × 1% = 100 $"},{label:"Étape 3 — Stop-loss",value:"30 pips"},{label:"Étape 4 — Valeur d'1 pip",value:"1 $/pip avec 0.01 lot"},{label:"Formule finale",value:"100 $ ÷ 30 pips = 3.33 → arrondi = 0.03 lot"}],correctAnswer:0.03,tolerance:0.005,unit:"lot",successText:"Bravo ! 100$ (ton risque max) ÷ 30 pips (ton stop) = 3.33. On arrondit vers le bas = 3 unités de 0.01 lot = 0.03 lot. Risque réel : 30 pips × 1$ × 3 = 90$. Juste sous 100$, c'est parfait.",hint:"Ton risque max = 100$. 1 pip vaut 1$ avec 0.01 lot. Donc : 100 ÷ 30 = 3.33 → prends 3 unités de 0.01 lot"},
+    {kind:"choice",instruction:"Tu prends un trade, il part bien. Tu es à +2R de profit. (R = ton Risque initial. Si tu as risqué 100$, +2R = +200$ de profit — tu as fait 2 fois ce que tu avais risqué.) Quelle est la bonne pratique ?",options:["Laisser courir sans stop, la tendance est forte","Fermer immédiatement les 100% pour sécuriser le profit","Déplacer le stop à break-even (ton prix d'entrée = plus aucun risque) et fermer la moitié de la position, laisser l'autre moitié courir","Doubler la taille puisque ça va bien"],correctIndex:2,successText:"La gestion professionnelle : tu fermes 50% à +2R pour sécuriser du profit réel, tu déplaces ton stop à break-even (prix d'entrée) donc la moitié restante ne risque plus rien, et tu laisses courir pour profiter si le mouvement continue. Le meilleur des deux mondes.",hintText:"Tu ne veux ni tout perdre (laisser courir sans protection) ni fermer trop tôt. La solution = prendre la moitié des profits et protéger le reste."},
+    {kind:"choice",instruction:"Tu as perdu 3 trades aujourd'hui pour -2.8% du compte. Il reste 2 heures de session NY. Que fais-tu ?",options:["Je continue normalement, c'est encore une bonne session","Je prends un dernier trade de grande taille pour récupérer","J'arrête pour aujourd'hui — règle : 3 pertes ou -2% max par jour → pause 24h obligatoire","Je passe à un autre actif"],correctIndex:2,successText:"Après 3 pertes ou -2% par jour, la règle est d'arrêter. Ton état mental est compromis. Les pires erreurs se font dans cet état.",hintText:"La règle de 3 pertes max ou -2% par jour existe précisément pour les jours où tout va mal."}
+  ]}
+};
+
+MODULE_CONTENT[7] = {
+  lesson:[
+    {type:"text",heading:"Le broker : ton accès direct au marché",body:"Un broker (courtier) est l'intermédiaire entre toi et le marché. Sans broker, tu ne peux pas placer un seul trade. Il existe deux grandes catégories :\n\n▸ Market Maker — le broker est l'autre côté de tes trades. Il crée sa propre liquidité. Avantage : exécution instantanée, spreads fixes. Risque : conflit d'intérêts potentiel (il gagne quand tu perds). Exemples : eToro, Oanda.\n\n▸ ECN/STP (No Dealing Desk) — le broker t'envoie directement sur le marché interbancaire. Aucun conflit d'intérêts. Spreads variables, souvent + commission. Exemples : IC Markets, Pepperstone, FP Markets.\n\nPour le trading sérieux sur le Forex et XAUUSD : préfère un broker ECN/STP régulé."},
+    {type:"text",heading:"Comment choisir son broker : les 5 critères essentiels",body:"Tous les brokers ne se valent pas. Voici les 5 critères non-négociables :\n\n1. Régulation — Le broker doit être régulé par un organisme reconnu : FCA (UK), ASIC (Australie), CySEC (Europe), FSA. Un broker non régulé = risque de perdre ton capital.\n\n2. Spread et commissions — Sur XAUUSD (l'or), un bon broker ECN offre un spread de 0.1 à 0.3 pip. Au-delà de 0.5 pip, tu paies trop.\n\n3. Exécution — Temps d'exécution idéal : < 100ms. Slippage excessif = problème.\n\n4. Dépôt minimum et retrait — Cherche des brokers avec retrait rapide (< 2 jours ouvrés) et sans frais cachés.\n\n5. Levier disponible — En Europe : max 1:30 (Forex), 1:20 (or). Offshore : jusqu'à 1:500. Attention : plus le levier est élevé, plus le risque est amplifié."},
+    {type:"text",heading:"Les types de comptes broker : Standard, Raw, Islamique",body:"La plupart des brokers offrent plusieurs types de comptes :\n\n▸ Compte Standard — Pas de commission directe, mais spread plus élevé. Idéal pour débuter. Dépôt minimum faible (50-200$).\n\n▸ Compte Raw/ECN — Commission fixe par lot (ex: 3.50$/lot) + spread minimal (0.0-0.2 pip). Moins coûteux à volume élevé. Recommandé pour les traders actifs.\n\n▸ Compte Islamique (Swap-Free) — Pas de swap (intérêt de nuit) pour respecter la loi islamique. Disponible sur demande chez la plupart des brokers.\n\n▸ Compte Démo — Capital fictif, marché réel. Utilise-le pour tester une stratégie avant de risquer ton argent. Important : le démo ne simule pas les émotions du capital réel.\n\nMon conseil : commence par un compte Standard chez un broker régulé, puis passe au Raw/ECN quand tu trades régulièrement."},
+    {type:"text",heading:"Compte perso vs Prop Firm : faire le bon choix",body:"Tu as maintenant les deux options sur la table. Voici comment choisir :\n\n▸ Compte personnel chez un broker\n— Tu es seul propriétaire de tes gains (100%)\n— Tu risques ton propre argent\n— Pas de règles imposées (pas de daily drawdown, pas de règle de consistance)\n— Dépôt minimum : 200$ à 5 000$ selon les objectifs\n— Liberté totale\n\n▸ Prop Firm\n— Tu trades avec le capital de la firme\n— Tu gardes 80-90% des profits\n— Règles strictes (drawdown, consistance, période)\n— Aucun capital personnel risqué (seulement les frais du challenge : 100-600$)\n— Idéal si tu n'as pas encore de capital\n\nLa vraie question : as-tu les 1 000-5 000$ nécessaires pour trader sérieusement avec ton propre argent, ou tu préfères payer 100-300$ pour accéder à 50 000-100 000$ de capital prop firm ?"},
+    {type:"text",heading:"Prop Firm ou compte réel personnel ?",body:"Une Prop Firm te prête son capital pour trader. En échange, elle prend une partie des profits (souvent 10-20%). Tu passes d'abord un challenge sur compte démo en respectant des règles strictes. Si tu passes, tu obtiens un compte financé (funded account).\n\nAvantage principal : tu trades avec 10 000$, 50 000$ voire 100 000$ sans avoir ce capital. Les profits sont proportionnels.\n\nPourquoi les prop firms sont strictes : elles prêtent leur argent. Leurs règles (drawdown, consistance) te forcent à être professionnel. Et paradoxalement, c'est ce qui te rend meilleur.\n\nPour 2026, E8 Markets One-Step est une option solide : one-step, profit target 8-10%, pas de limite de temps, news trading OK. Vérifie toujours les règles exactes sur leur site."},
+    {type:"table",heading:"Les différents types de drawdown",headers:["Type","Définition","Limite typique"],rows:[["Maximum Drawdown","Perte max depuis le pic du compte","2-10%"],["Daily Drawdown","Perte max sur une seule journée","0.5-5%"],["Trailing Drawdown","Calculé depuis le plus haut atteint, se déplace avec les profits","Variable"],["Static Drawdown","Calculé depuis le solde initial, ne bouge pas","Fixe"],["EOD Drawdown","Calculé sur les prix de clôture uniquement","Protège les scalpers"]],callout:"Le trailing drawdown est le plus piégeux : si tu fais +1 000$, ton drawdown autorisé monte aussi. Si tu redescends ensuite, tu consommes ce nouveau drawdown. Sécurise tes profits tôt."},
+    {type:"text",heading:"La règle de consistance : ce que 90% des challenges ratent",body:"La règle de consistance empêche de passer un challenge grâce à un ou deux énormes jours de chance.\n\nFormule : Consistance % = (Profit du meilleur jour ÷ Profit total) × 100\n\nExemple : profit total +3 000$, meilleur jour +1 200$. 1 200 ÷ 3 000 = 40%. Si la règle est 30%, tu BREACHES même en étant profitable.\n\nComment respecter la consistance :\n1. Risque constant : toujours 0.5-1% par trade\n2. Profits partiels : ferme 50% à +1R ou +2R\n3. Vise la régularité : +200-500$/jour sur 10-15 jours plutôt que +3 000$ en une session\n4. Journalise chaque jour et calcule ton % best day en temps réel"},
+    {type:"text",heading:"Règles de survie en prop firm",body:"SL obligatoire sur TOUS les trades. Sans exception.\n\nVise < 1% de risque par trade même si la daily limit est plus haute. La daily limit de 5% est un plafond de sécurité, pas un guide de sizing.\n\nSur trailing drawdown : dès que tu es en profit, déplace le SL à break-even. Plus vite tu sécurises, moins tu consommes de drawdown si ça retourne.\n\nPause obligatoire : après 3 pertes ou -200$/jour en challenge, stop.\n\nLis toujours les règles exactes de ta firm. FTMO, FundedNext, Topstep, E8 — chacune a ses propres calculs. Ne suppose jamais que les règles sont identiques."},
+    {type:"text",heading:"Le saut vers le capital réel : ce qu'il faut comprendre",body:"Passer en prop firm ou en compte réel personnel est un changement psychologique majeur. Le trading reste 80% mental, et gérer la peur, l'avidité et les drawdowns sous vraie pression est la vraie clé du succès à cette étape.\n\nTes choix principaux : option 1, une prop firm fiable avec de bons avis et des payouts rapides. Option 2, un compte live direct si tu as suffisamment de confiance après tes sessions de démo (un capital minimum raisonnable est recommandé pour absorber les premières erreurs sans tout perdre).\n\nRègles communes peu importe l'option choisie : stop-loss obligatoire sur TOUS les trades, risque maximum de 1-2% par trade, journal mis à jour régulièrement avec captures d'écran et trades documentés, et l'objectif principal est de passer le challenge SANS bracher — c'est-à-dire prouver que ton mental tient sous pression, pas seulement que ta technique fonctionne.\n\nRappel quotidien non-négociable : après 3 pertes ou un montant de perte prédéfini dans une même journée, pause obligatoire de 24h. Ce n'est pas une suggestion, c'est une règle de survie."},
+    {type:"text",heading:"Ta propre route commence après cette formation",body:"À ce stade, tu as les bases solides : lire un graphique, identifier les tendances, placer des stops, gérer le risque, respecter des règles strictes de drawdown et de consistance. Mais le trading n'est pas une recette que qui que ce soit peut te donner à 100%.\n\nÀ partir de maintenant, c'est à toi de prendre les rênes. Gère tes émotions toi-même : les pertes vont te frustrer, les gains vont te rendre euphorique, le revenge trading et la peur de rater sortent toujours en argent réel. Observe-toi sans jugement, note tes réactions, et forge ton mental jour après jour.\n\nDéveloppe TA propre technique : prends ce que tu as appris ici, teste-le, adapte-le, et garde ce qui colle à ta personnalité, ton emploi du temps et ta tolérance au risque. Le seul setup qui te rendra vraiment consistant est celui que tu auras créé et testé toi-même.\n\nApprends en faisant, et en perdant un peu : les formations, vidéos et mentors sont excellents pour démarrer. Mais la vraie progression arrive quand tu trades, perds, analyses pourquoi, et ajustes. Accepte que tes 100 (voire 500) premiers trades soient des leçons payantes. C'est normal, et c'est nécessaire pour devenir un trader complet."}
+  ],
+  quiz:[
+    {q:"Tu es en challenge. Profit total : +2 000$. Meilleur jour : +900$. La firm impose une règle de consistance à 40% maximum. Es-tu dans les règles ?",options:["Oui, 900/2000 = 45%, c'est sous 50% donc c'est OK","Non, 900/2000 = 45%, c'est au-dessus de 40% → tu brises les règles (breach = violation = disqualification)","Oui, 40% s'applique uniquement au drawdown, pas à la consistance","La règle de consistance ne s'applique pas si ton profit total est positif"],correct:1,explain:"Calcul : 900 ÷ 2 000 = 0.45 × 100 = 45%. La règle est 40% maximum. 45% > 40% = tu brises les règles ('breach') même si tu es profitable. La firm te disqualifie."},
+    {q:"Qu'est-ce qu'un trailing drawdown ?",options:["Un drawdown sur prix de clôture uniquement","Un drawdown qui se recalcule depuis le plus haut atteint par le compte","Un drawdown quotidien remis à zéro","Le drawdown total depuis le début"],correct:1,explain:"Le trailing DD suit le pic du compte. Si tu fais +2 000$, ton drawdown autorisé monte aussi. Il faut sécuriser les profits rapidement."},
+    {q:"Quel pourcentage du trading reste mental même au moment de passer au capital réel ?",options:["20%","50%","80%","Le mental n'a plus d'importance avec de l'expérience"],correct:2,explain:"Le trading reste 80% mental, même (surtout) en argent réel. Gérer la peur, l'avidité et les drawdowns sous vraie pression est la clé du passage réussi."},
+    {q:"Pourquoi les prop firms imposent des règles aussi strictes ?",options:["Pour générer des revenus sur les frais","Pour s'assurer que les traders soient consistants — elles prêtent leur capital","Pour décourager les débutants","Par obligation réglementaire"],correct:1,explain:"Les prop firms prêtent leur vrai capital. Elles ont besoin de traders disciplinés et reproductibles."},
+    {q:"Sur un trailing drawdown (drawdown qui se recalcule à chaque nouveau profit), quelle est la meilleure pratique dès que tu es en profit ?",options:["Laisser courir sans toucher au stop-loss","Déplacer rapidement le stop-loss à break-even (= ton prix d'entrée exact, ni perte ni gain si touché)","Agrandir la position pour profiter du mouvement","Fermer immédiatement pour sécuriser"],correct:1,explain:"Break-even (seuil de rentabilité) = déplacer ton stop-loss exactement à ton prix d'entrée. Si le marché revient en arrière, tu sors à zéro : ni perte, ni gain. Ça te protège sans fermer le trade. Et en trailing drawdown, ça t'évite de 'consommer' du drawdown inutilement."},
+    {q:"Ton challenge a une daily drawdown de 5%. Cela signifie que tu dois :",options:["Risquer 5% par trade","Utiliser 5% comme plafond absolu, mais viser < 1% par trade","Faire 5 trades max par jour","Arrêter dès que tu perds 5% sur un trade"],correct:1,explain:"La daily limit est un plafond de sécurité, pas un objectif. Vise toujours < 1% par trade."},
+    {q:"Quel est l'objectif principal d'un challenge prop firm, au-delà du simple profit ?",options:["Faire le plus de trades possible pour montrer son activité","Prouver que ton mental tient sous pression sans jamais briser les règles ('bracher' = violer une règle = être disqualifié)","Trouver la stratégie parfaite sans aucune perte","Impressionner la communauté de trading avec tes résultats"],correct:1,explain:"L'objectif d'un challenge c'est de prouver que tu es un trader consistant et discipliné sous pression réelle, pas seulement profitable. Rester dans les règles = montrer à la firm que tu es prêt à gérer leur vrai capital."},
+    {q:"Quelle est la bonne formule pour le score de consistance ?",options:["(Profit total ÷ Meilleur jour) × 100","(Meilleur jour ÷ Profit total) × 100","(Jours profitables ÷ Total jours) × 100","(Profit moyen ÷ Perte moyenne) × 100"],correct:1,explain:"Consistance % = (Meilleur jour ÷ Profit total) × 100. Plus ce % est bas, plus tu es consistant."}
+  ,
+    {q:"Un broker ECN/STP, c'est quoi ?",options:["Un broker qui joue contre toi","Un broker qui t'envoie directement sur le marché interbancaire","Un broker sans spread","Un broker réservé aux professionnels"],correct:1,explain:"ECN/STP (No Dealing Desk) = ton ordre va directement sur le marché réel, sans conflit d'intérêts. Le broker gagne via la commission, pas sur tes pertes. Préférable pour du trading sérieux."},
+    {q:"Quel organisme de régulation est reconnu pour les brokers Forex en Australie ?",options:["FCA","ASIC","CySEC","SEC"],correct:1,explain:"ASIC (Australian Securities and Investments Commission) est le régulateur australien, reconnu comme l'un des plus stricts. FCA = UK, CySEC = Chypre/UE. Un broker régulé = ton capital est protégé."},
+    {q:"Sur XAUUSD, quel spread maximum est encore acceptable chez un bon broker ECN ?",options:["0.1 pip","0.3 pip","0.5 pip","1.0 pip"],correct:1,explain:"Un bon broker ECN offre 0.1 à 0.3 pip sur l'or (XAUUSD). Au-delà de 0.5 pip, tu paies trop cher à chaque trade. Sur un scalp de 10 trades/jour, ça fait une différence énorme en fin de mois."},
+    {q:"Tu veux trader souvent avec des petits capitaux. Quel type de compte broker est le plus adapté ?",options:["Compte Standard (pas de commission)","Compte Raw/ECN (commission + spread minimal)","Compte Islamique","Compte Démo"],correct:1,explain:"À volume élevé, le compte Raw/ECN (commission fixe ~3.50$/lot + spread 0.0 pip) est moins coûteux que le Standard (pas de commission mais spread plus large). Le Standard convient pour débuter ou trader peu fréquemment."},
+    {q:"Quelle est la principale différence entre un compte démo et un compte réel ?",options:["Le démo a de vrais marchés, le réel a des marchés fictifs","Le démo ne simule pas les émotions liées au capital réel","Le démo est plus rentable que le réel","Il n'y a aucune différence"],correct:1,explain:"Le démo est excellent pour tester une stratégie, mais il ne reproduit pas la pression émotionnelle du capital réel. En démo tu prends des risques que tu n'oserais jamais en réel. La transition démo → réel est souvent difficile."}
+  ],
+  exercise:{steps:[
+    {kind:"calc-input",instruction:"Tu fais un challenge prop firm sur un compte de 10 000$. Après 8 jours, ton profit total est +850$ et ton meilleur jour était +310$. La firm impose une règle de consistance à 35% maximum. Calcule ton score de consistance (en %) pour savoir si tu es dans les règles.",given:[{label:"Profit total",value:"850 $"},{label:"Meilleur jour",value:"310 $"},{label:"Règle de consistance max",value:"35%"},{label:"Étape 1",value:"310 ÷ 850 = ?"},{label:"Étape 2",value:"Résultat × 100 = ? %"},{label:"Question",value:"Est-ce au-dessus ou en dessous de 35% ?"}],correctAnswer:36.5,tolerance:1,unit:"%",successText:"310 ÷ 850 = 0.365 × 100 = 36.5%. C'est AU-DESSUS de la limite de 35% : tu briserais les règles si tu demandais un payout maintenant. Solution : continue de trader régulièrement avec de petits profits chaque jour — plus ton profit total monte, plus ton score de consistance baisse naturellement.",hint:"Division : 310 ÷ 850, puis multiplie par 100. Compare ton résultat à 35%."},
+    {kind:"choice",instruction:"Tu as réussi ton challenge et tu es maintenant 'funded' (= la firm t'a confié un compte de 50 000$ de leur propre argent à trader). Tu as eu d'excellents résultats cette semaine. Lundi matin, tu as une forte conviction sur XAUUSD. Quel pourcentage risques-tu sur ce trade ?",options:["3% car tu es en bonne passe","1% maximum soit 500$, peu importe la conviction","5% car c'est la limite daily","0% pour protéger les profits"],correctIndex:1,successText:"1% maximum, toujours. Une conviction élevée ne change pas les probabilités réelles. Le marché se fout de ta bonne semaine.",hintText:"La règle du 1% s'applique à tous les trades, sans exception, peu importe le contexte ou la conviction."}
+  ]}
+};
+
+MODULE_CONTENT[8] = {
+  lesson:[
+    {type:"text",heading:"Récapitulatif — Partie 1 : Fondations et contexte",body:"Tu as parcouru les 7 modules de l'Académie Ember Trading. Voici une synthèse en plusieurs parties pour bien tout fixer avant l'examen.\n\nModule 1 — Fondations : Forex, crypto, commodités et futures. Broker et compte démo. Types d'ordres (Market, Limit, Stop, SL, TP). Bougies japonaises et bougies spéciales (Doji, Marteau, Étoile filante, Engulfing). Effet de levier et appel de marge. Styles de trading (scalping, day, swing).\n\nModule 2 — Sessions & Macro : Les 4 sessions et leurs overlaps. Banques centrales, FOMC, NFP, CPI, PIB. Risk-on/risk-off. DXY et or inversement corrélés. Combiner biais macro et entrées techniques."},
+    {type:"text",heading:"Récapitulatif — Partie 2 : Analyse technique",body:"Module 3 — S&R & Tendance : Support et résistance, plus un niveau est testé plus il est fort. Inversion des rôles (une cassure transforme le rôle du niveau). Lignes de tendance (3 points pour fiabilité). MA20, MA50, MA200, golden cross et death cross.\n\nModule 4 — Structure : Higher High/Higher Low vs Lower High/Lower Low. Accumulation-Manipulation-Distribution (AMD). Change of Character (CHoCH) comme premier signal d'alerte. Analyse top-down (H4 → H1 → M15). Méthode accumulation-continuation (~80% de probabilité statistique)."},
+    {type:"text",heading:"Récapitulatif — Partie 3 : Smart Money et gestion",body:"Module 5 — SMC : Fair Value Gap (3 bougies, vide non comblé). Order Block (dernière bougie avant l'impulsion, perd sa force après plusieurs retests). Liquidity zones et stop hunts. Patterns Bull Flag et Bear Flag. Confluence (OB + FVG + liquidité) = probabilité maximale.\n\nModule 6 — Psychologie & Risque : Règle 1-2% par trade, jamais plus. Calcul de taille de position (risque ÷ stop = lots). SL obligatoire sur chaque trade. Erreurs fatales à éviter : SL déplacé, Martingale, FOMO, revenge trading. Journal de trading et auto-analyse émotionnelle.\n\nModule 7 — Prop Firm : Types de drawdown (trailing, static, daily, EOD). Règle de consistance et sa formule (meilleur jour ÷ profit total × 100). Règles de survie en funded account, et l'importance du mental sous pression réelle."},
+    {type:"text",heading:"Checklist finale avant de risquer de l'argent réel",body:"Avant de passer du compte démo à un challenge prop firm ou un compte réel, vérifie honnêtement chacun de ces points.\n\nTechnique : je peux identifier un support et une résistance en quelques secondes sur n'importe quel graphique. Je sais tracer une ligne de tendance valide et reconnaître une structure HH/HL ou LH/LL. Je comprends comment lire un FVG, un Order Block et une zone de liquidité, et je sais les combiner pour une confluence.\n\nRisque : je calcule systématiquement ma taille de position avant chaque trade, jamais après. Je place toujours mon stop-loss avant d'entrer, jamais après. Je ne dépasse jamais 1-2% de risque par trade, peu importe ma conviction.\n\nMental : j'ai un journal de trading actif depuis au moins quelques semaines. Je connais mes propres faiblesses émotionnelles (identifiées via mon journal). J'ai déjà vécu une série de pertes en démo sans paniquer ni dévier de mon plan.\n\nSi tu peux cocher honnêtement tous ces points, tu es prêt pour l'examen final, et probablement prêt à commencer sérieusement ton parcours de trader. Bonne chance."}
+  ],
+  quiz:[
+    {q:"Sur une bougie baissière, où se trouve le CLOSE ?",options:["En haut du corps","En bas du corps","Au sommet de la mèche haute","Au bas de la mèche basse"],correct:1,explain:"Bougie baissière : open en haut du corps, close en bas du corps. Les vendeurs ont gagné."},
+    {q:"L'overlap Londres + New York (08h-12h EST) est important parce que :",options:["C'est le seul moment où les news sortent","Il concentre le plus grand volume et la meilleure liquidité de la journée","Les spreads sont les plus larges","Les institutions ne tradent pas à cette heure"],correct:1,explain:"60%+ du volume Forex mondial sur cet overlap. Meilleure liquidité = spreads serrés + setups plus fiables."},
+    {q:"Sur le graphique 4H tu vois une structure haussière (HH = sommets montants, HL = creux montants). Sur le graphique 1H tu vois une structure baissière (LH = sommets descendants, LL = creux descendants). Quelle est ta conclusion ?",options:["Le 4H est haussier et le 1H est en pullback (correction normale) : chercher un achat au prochain support 1H","La structure baissière sur 1H domine tout, vendre immédiatement","La contradiction des deux graphiques annule tout signal, ne rien faire","Attendre que le 1H et le 4H soient tous les deux baissiers pour vendre"],correct:0,explain:"Le timeframe 4H domine toujours le 1H dans l'analyse top-down. Une structure baissière sur 1H à l'intérieur d'une tendance haussière sur 4H, c'est juste un pullback (correction normale). C'est une opportunité d'achat au prochain support 1H, pas un signal de vente."},
+    {q:"Dans le modèle AMD, après la Manipulation (faux breakout), que se passe-t-il ?",options:["Le marché range à nouveau","Le prix repart dans la vraie direction : la Distribution","Nouvelle Accumulation","Rien, le faux breakout est le dernier signal"],correct:1,explain:"Accumulation → Manipulation (faux breakout) → Distribution (vrai mouvement). C'est le cycle institutionnel."},
+    {q:"Un FVG Bearish signifie que :",options:["Le low de la 3ème bougie > high de la 1ère","Le high de la 3ème bougie < low de la 1ère — prix a plongé en créant un vide","Les 3 bougies sont rouges","Gap d'ouverture entre deux sessions"],correct:1,explain:"FVG Bearish : high de la bougie 3 < low de la bougie 1. Prix a plongé trop vite, laissant un vide non comblé."},
+    {q:"Compte 8 000$. Stop à 40 pips. 0.01 lot XAUUSD = 1$/pip. Lot maximum pour 1% de risque ?",options:["0.01 lot","0.02 lot","0.03 lot","0.05 lot"],correct:1,explain:"1% de 8 000$ = 80$. 80$ ÷ 40 pips = 2 unités de 0.01 lot = 0.02 lot."},
+    {q:"Règle de consistance à 30%. Ton profit total est +4 000$. Quel est le profit maximum possible en un seul jour sans briser les règles ('bracher' = dépasser la limite = être disqualifié) ?",options:["1 000$","1 200$","400$","2 000$"],correct:1,explain:"Calcul : 30% de 4 000$ = 1 200$. Si ton meilleur jour dépasse 1 200$, ton score de consistance dépasserait 30% → tu brises les règles → disqualification, même si ton profit total est excellent."},
+    {q:"OB Bullish + FVG Bullish dans une zone de liquidité. Que représente cette confluence ?",options:["Signal contradictoire à éviter","Setup à haute probabilité : trois raisons institutionnelles de réagir","La zone est trop populaire","Un seul signal suffit toujours"],correct:1,explain:"Confluence maximale : OB + FVG + liquidity zone = trois raisons institutionnelles. Plus de confluence = probabilité plus élevée."},
+    {q:"Tu veux acheter seulement si le prix monte au-dessus d'une résistance pour suivre une cassure. Quel ordre utilises-tu ?",options:["Buy Limit","Sell Stop","Buy Stop","Sell Limit"],correct:2,explain:"Buy Stop : s'exécute si le prix MONTE jusqu'au niveau, parfait pour suivre une cassure haussière."},
+    {q:"Dans une tendance haussière (Higher Highs + Higher Lows), qu'est-ce qui définit un Change of Character (CHoCH) — c'est-à-dire le premier signe d'alerte que la tendance pourrait changer ?",options:["Une nouvelle grande bougie verte qui confirme la hausse","Le prix casse sous le dernier Higher Low — le creux le plus récent est brisé à la baisse","Un nouveau Higher High se forme au-dessus du précédent","Trois bougies rouges consécutives apparaissent"],correct:1,explain:"CHoCH en tendance haussière : le prix casse sous le dernier Higher Low. C'est la première cassure de la structure haussière — le signal d'alerte que les vendeurs reprennent peut-être le contrôle. Ce n'est pas une certitude de retournement, mais c'est le moment de réduire son biais haussier."}
+  ],
+  exercise:{steps:[
+    {kind:"click-target",instruction:"EXAMEN — Partie 1/3 : Identifie la zone de SUPPORT la plus forte (testée plusieurs fois, tenue à chaque fois).",candles:[{o:150,h:153,l:149,c:151},{o:151,h:154,l:150,c:152.5},{o:152.5,h:156,l:152,c:153},{o:153,h:156.5,l:149.5,c:150},{o:150,h:152,l:149.2,c:151.5},{o:151.5,h:154,l:150.8,c:153},{o:153,h:157,l:152.5,c:155},{o:155,h:158,l:154,c:154.5},{o:154.5,h:156,l:149.3,c:150.2},{o:150.2,h:152,l:149.8,c:151},{o:151,h:153.5,l:150.5,c:153},{o:153,h:155,l:152.5,c:154.5},{o:154.5,h:157,l:154,c:156},{o:156,h:159,l:155.5,c:158},{o:158,h:161,l:157.5,c:160},{o:160,h:163,l:159.5,c:162}],targets:[{id:"support",priceMin:148.8,priceMax:150.5}],successText:"Excellent. Le niveau ~149-150 a été testé 3 fois (bougies 4, 5 et 9) et a tenu à chaque fois. C'est le support le plus fort.",hintText:"Cherche le niveau où les mèches basses touchent le même prix plusieurs fois sans jamais le casser."},
+    {kind:"click-target",instruction:"EXAMEN — Partie 2/3 : Ce graphique montre un FVG Bearish suivi d'un retest. Clique sur la zone du FVG (le vide entre les bougies lors de la chute rapide).",candles:[{o:300,h:302,l:299,c:301},{o:301,h:303,l:300,c:302},{o:302,h:304,l:301,c:303.5},{o:303.5,h:305,l:302.5,c:304},{o:304,h:305.5,l:303,c:304.5},{o:304.5,h:305.8,l:303.5,c:305},{o:305,h:300,l:296,c:296.5},{o:296.5,h:298,l:295,c:296},{o:296,h:297,l:295.5,c:296.5},{o:296.5,h:300,l:296,c:299.5},{o:299.5,h:301.5,l:299,c:300.5},{o:300.5,h:302,l:299.5,c:299.8},{o:299.8,h:300.5,l:298,c:298.5},{o:298.5,h:299,l:296.5,c:297},{o:297,h:297.5,l:295,c:295.5},{o:295.5,h:296,l:293,c:293.5}],targets:[{id:"bearish-fvg",priceMin:297,priceMax:303.5}],successText:"Correct. La chute rapide (bougie 7) a laissé un vide entre ~297 et ~303.5. C'est le FVG Bearish. Le prix est remonté le tester avant de continuer la baisse.",hintText:"La grande bougie baissière a plongé très vite, créant un vide entre son low et le high de la bougie précédente."},
+    {kind:"calc-input",instruction:"EXAMEN — Partie 3/3 : Challenge 25 000$. Après 12 jours : profit total = +2 100$, meilleur jour = +620$. Règle de consistance à 30%. Entre ton score de consistance en %.",given:[{label:"Profit total",value:"2 100 $"},{label:"Meilleur jour",value:"620 $"},{label:"Règle max",value:"30%"},{label:"Formule",value:"(620 ÷ 2100) × 100"}],correctAnswer:29.5,tolerance:1,unit:"%",successText:"(620 ÷ 2100) × 100 = 29.5%. Tu es dans les règles, mais juste sous la limite de 30% ! Pour la suite du challenge, sois prudent : si ton profit total monte à 3 000$, ton meilleur jour ne devra pas dépasser 900$ (30% de 3 000$). Plus tu fais de jours réguliers à petits profits, plus tu as de marge.",hint:"(620 ÷ 2100) × 100 = ?"}
+  ]}
+};
+
+/* ---------- INIT ---------- */
+if(hasAccess()){
+  nav.screen = "dashboard";
+} else {
+  nav.screen = "gate";
+}
+render();
+
+
+/* ══════════════════════════════════════════════════════════
+   FOND ANIMÉ — Lignes de prix + halos ember
+   ══════════════════════════════════════════════════════════ */
+(function(){
+  var canvas = document.getElementById("gameBg");
+  if(!canvas) return;
+  var ctx = canvas.getContext("2d");
+  var W, H;
+
+  /* ── Orbes ember ── */
+  var orbs = [
+    {ox:0.15, oy:0.20, r:0.50, color:[255,90,20],  a:0.055, sp:0.00010, ph:0.0},
+    {ox:0.85, oy:0.65, r:0.45, color:[255,178,60],  a:0.040, sp:0.00008, ph:2.1},
+    {ox:0.50, oy:0.90, r:0.40, color:[255,120,30],  a:0.035, sp:0.00012, ph:4.3},
+  ];
+
+  /* ── Lignes de prix (paths sinusoïdaux) ── */
+  var lines = [
+    {y:0.30, amp:0.06, freq:1.3, sp:0.00018, ph:0.0,  col:[255,138,30], a:0.07, w:1.5},
+    {y:0.55, amp:0.04, freq:0.9, sp:0.00014, ph:1.7,  col:[255,90,20],  a:0.05, w:1.2},
+    {y:0.72, amp:0.05, freq:1.6, sp:0.00016, ph:3.2,  col:[255,178,60], a:0.04, w:1.0},
+  ];
+
+  function resize(){
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  var t = 0;
+
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+
+    /* Fond de base */
+    ctx.fillStyle = "#0b0906";
+    ctx.fillRect(0, 0, W, H);
+
+    /* Orbes */
+    orbs.forEach(function(o){
+      var phase = t * o.sp;
+      var x = (o.ox + Math.sin(phase * 1.1) * 0.12) * W;
+      var y = (o.oy + Math.cos(phase * 0.8) * 0.09) * H;
+      var r = o.r * Math.max(W, H);
+      var g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      var c = o.color;
+      g.addColorStop(0,   "rgba("+c[0]+","+c[1]+","+c[2]+","+o.a+")");
+      g.addColorStop(0.5, "rgba("+c[0]+","+c[1]+","+c[2]+","+(o.a*0.35)+")");
+      g.addColorStop(1,   "rgba("+c[0]+","+c[1]+","+c[2]+",0)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI*2);
+      ctx.fill();
+    });
+
+    /* Lignes de prix */
+    lines.forEach(function(l){
+      var segments = 120;
+      var dx = W / segments;
+      ctx.beginPath();
+      ctx.lineWidth = l.w;
+      ctx.strokeStyle = "rgba("+l.col[0]+","+l.col[1]+","+l.col[2]+","+l.a+")";
+      for(var i = 0; i <= segments; i++){
+        var x = i * dx;
+        var phase = t * l.sp + i * 0.08;
+        var y = (l.y + Math.sin(phase * l.freq) * l.amp
+                     + Math.sin(phase * l.freq * 2.3 + 1.0) * l.amp * 0.4) * H;
+        if(i === 0) ctx.moveTo(x, y);
+        else        ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    });
+
+    t++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+</script>
+</body>
+</html>
