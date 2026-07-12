@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0c0a08">
 <title>Ember Trading — Académie Interactive</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+
   :root{
     --bg:#0c0a08;
     --bg-panel:#16110d;
@@ -25,9 +24,9 @@
     --ok:#36c98e;
     --bad:#ef4b4b;
     --radius:14px;
-    --font-display:"Oswald","Arial Narrow",sans-serif;
-    --font-body:"Inter",-apple-system,"Segoe UI",sans-serif;
-    --font-mono:"JetBrains Mono","Consolas",monospace;
+    --font-display:\"Oswald\",\"Arial Narrow\",sans-serif;
+    --font-body:\"Inter\",-apple-system,\"Segoe UI\",sans-serif;
+    --font-mono:\"JetBrains Mono\",\"Consolas\",monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html,body{min-height:100%;}
@@ -39,8 +38,22 @@
     position:relative;
     overflow-x:hidden;
   }
-  
-   to{ background-position:center top, -240px 60%; } }
+  body::before{
+    content:\"\";
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    opacity:0.5;
+    background-image:
+      radial-gradient(ellipse 70% 50% at 50% -10%, rgba(255,90,20,0.18), transparent 60%),
+      url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='120' viewBox='0 0 240 120'%3E%3Cg fill='%23ff8a1e' opacity='0.05'%3E%3Crect x='10' y='40' width='6' height='50'/%3E%3Crect x='30' y='20' width='6' height='70'/%3E%3Crect x='50' y='55' width='6' height='30'/%3E%3Crect x='70' y='10' width='6' height='85'/%3E%3Crect x='90' y='45' width='6' height='45'/%3E%3Crect x='110' y='30' width='6' height='65'/%3E%3Crect x='130' y='50' width='6' height='40'/%3E%3Crect x='150' y='15' width='6' height='80'/%3E%3Crect x='170' y='38' width='6' height='52'/%3E%3Crect x='190' y='25' width='6' height='68'/%3E%3Crect x='210' y='48' width='6' height='42'/%3E%3C/g%3E%3C/svg%3E\");
+    background-repeat:no-repeat, repeat-x;
+    background-position:center top, 0 60%;
+    background-size:100% 100%, 240px 120px;
+    animation:bgpan 60s linear infinite;
+  }
+  @keyframes bgpan{ from{ background-position:center top, 0 60%; } to{ background-position:center top, -240px 60%; } }
   @media (prefers-reduced-motion: reduce){ body::before{ animation:none; } *{ transition:none !important; animation:none !important; } }
 
   #app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;}
@@ -68,6 +81,7 @@
   .link-back{font-family:var(--font-mono);font-size:13px;color:var(--text-low);padding:6px 0;}
   .link-back:hover{color:var(--ember-3);}
 
+  /* ---------- GATE ---------- */
   .gate-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;}
   .gate-card{
     width:100%;max-width:420px;text-align:center;
@@ -91,17 +105,8 @@
   .gate-error{color:var(--bad);font-size:13.5px;margin-top:14px;}
   .gate-footer{color:var(--text-low);font-size:13px;margin-top:22px;}
   .gate-footer a{color:var(--ember-3);}
-  .gate-social{display:flex;justify-content:center;gap:14px;margin-top:16px;}
-  .gate-social-btn{
-    width:42px;height:42px;border-radius:50%;
-    background:var(--bg-panel-2);border:1px solid var(--line);
-    display:flex;align-items:center;justify-content:center;
-    color:var(--text-low);transition:border-color .15s ease, color .15s ease, transform .15s ease;
-    text-decoration:none;
-  }
-  .gate-social-btn svg{width:19px;height:19px;}
-  .gate-social-btn:hover{border-color:var(--ember-2);color:var(--ember-3);transform:translateY(-2px);}
 
+  /* ---------- DASHBOARD ---------- */
   .dashboard{flex:1;max-width:640px;width:100%;margin:0 auto;padding:32px 20px 60px;}
   .dash-header{display:flex;align-items:center;gap:14px;margin-bottom:6px;}
   .dash-mark{width:34px;height:34px;color:var(--ember-2);flex-shrink:0;}
@@ -121,7 +126,7 @@
     position:relative;flex-shrink:0;width:56px;height:56px;border-radius:50%;
     display:flex;align-items:center;justify-content:center;
     background:var(--bg-panel-2);border:2px solid var(--line);
-    margin-left:-1px;transition:transform .15s ease;
+    margin-left:-1px;
   }
   .node-circle svg{width:24px;height:24px;}
   .node.locked .node-circle{opacity:0.5;color:var(--text-low);}
@@ -141,17 +146,21 @@
   .node.completed .node-status{background:rgba(54,201,142,0.15);color:var(--ok);}
   .node-clickable{cursor:pointer;}
   .node-clickable:hover .node-circle{transform:scale(1.05);}
+  .node-circle{transition:transform .15s ease;}
 
   .dash-footer{margin-top:40px;text-align:center;}
   .dash-tagline{font-family:var(--font-mono);font-size:11.5px;color:var(--text-low);letter-spacing:0.1em;text-transform:uppercase;}
-  .dash-reset{margin-top:16px;font-size:12.5px;color:var(--text-low);text-decoration:underline;}
+  .dash-reset{margin-top:16px;font-size:12.5px;color:var(--text-low);text-decoration:underline;}.dash-logout{display:block;margin-top:8px;font-size:12.5px;color:var(--text-low);text-decoration:underline;background:none;border:none;cursor:pointer;padding:0;}.dash-logout:hover{color:var(--ember-2);}
   .dash-reset:hover{color:var(--bad);}
 
+  /* ---------- SHARED SCREEN ---------- */
   .screen{flex:1;max-width:640px;width:100%;margin:0 auto;padding:24px 20px 60px;}
   .screen-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
   .screen-tag{font-family:var(--font-mono);font-size:12px;color:var(--ember-3);letter-spacing:0.08em;text-transform:uppercase;}
 
+  /* ---------- LESSON ---------- */
   .lesson-card{background:var(--bg-panel);border:1px solid var(--line);border-radius:var(--radius);padding:28px 26px;}
+  .lesson-module-title{font-family:var(--font-display);font-weight:700;font-size:14px;color:var(--ember-3);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:14px;}
   .lesson-heading{font-family:var(--font-display);font-weight:600;font-size:21px;margin-bottom:12px;}
   .lesson-body p{color:var(--text-mid);font-size:15px;margin-bottom:12px;}
   .lesson-body p:last-child{margin-bottom:0;}
@@ -168,6 +177,7 @@
   .lesson-dot.done{background:var(--ember-2);}
   .lesson-nav{display:flex;justify-content:space-between;gap:10px;margin-top:24px;}
 
+  /* ---------- QUIZ ---------- */
   .quiz-card,.quiz-result-card{background:var(--bg-panel);border:1px solid var(--line);border-radius:var(--radius);padding:28px 26px;}
   .quiz-question{font-family:var(--font-display);font-weight:600;font-size:19px;margin-bottom:18px;}
   .quiz-options{display:flex;flex-direction:column;gap:10px;}
@@ -187,6 +197,7 @@
   .quiz-result-score{font-family:var(--font-mono);font-size:28px;color:var(--ember-3);margin-bottom:10px;}
   .quiz-result-msg{color:var(--text-mid);font-size:14.5px;margin-bottom:22px;}
 
+  /* ---------- EXERCISE ---------- */
   .exercise-card{background:var(--bg-panel);border:1px solid var(--line);border-radius:var(--radius);padding:26px;}
   .exercise-instruction{font-size:15px;color:var(--text-hi);margin-bottom:16px;}
   .chart-wrap{background:var(--bg-panel-2);border:1px solid var(--line);border-radius:10px;padding:10px;cursor:crosshair;}
@@ -196,122 +207,7 @@
   .exercise-feedback.bad{background:rgba(239,75,75,0.1);color:#ff9d9d;border:1px solid rgba(239,75,75,0.25);}
   .exercise-actions{margin-top:18px;}
 
-  .calc-given{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;padding:14px;background:var(--bg-panel-2);border-radius:10px;border:1px solid var(--line);}
-  .calc-row{display:flex;justify-content:space-between;align-items:center;font-size:14px;}
-  .calc-label{color:var(--text-mid);}
-  .calc-value{font-family:var(--font-mono);color:var(--ember-3);font-size:15px;}
-  .calc-input-row{display:flex;gap:8px;align-items:center;margin-top:8px;}
-  .calc-input{flex:1;padding:12px 14px;border-radius:10px;background:var(--bg-panel-2);border:1px solid var(--line);color:var(--text-hi);font-family:var(--font-mono);font-size:18px;}
-  .calc-input:focus{border-color:var(--ember-2);}
-  .calc-unit{font-family:var(--font-mono);font-size:13px;color:var(--text-mid);white-space:nowrap;}
-
-  .cert-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;flex-direction:column;gap:20px;}
-  .cert-input-area{width:100%;max-width:540px;background:var(--bg-panel);border:1px solid var(--line);border-radius:var(--radius);padding:28px 24px;text-align:center;}
-  .cert-input-title{font-family:var(--font-display);font-size:17px;font-weight:600;color:var(--ember-3);margin-bottom:6px;}
-  .cert-input-sub{color:var(--text-mid);font-size:13.5px;margin-bottom:18px;}
-  .cert-name-row{display:flex;gap:8px;}
-  .cert-name-input{flex:1;padding:13px 14px;border-radius:10px;background:var(--bg-panel-2);border:1px solid var(--line);color:var(--text-hi);font-family:var(--font-body);font-size:15px;}
-  .cert-name-input:focus{border-color:var(--ember-2);}
-
-  /* ---- CERTIFICATE DOCUMENT ---- */
-  .cert-doc{
-    width:100%;max-width:640px;
-    background:linear-gradient(160deg,#1a1108 0%,#120d06 50%,#1a1108 100%);
-    border:1px solid #3a2a15;
-    border-radius:4px;
-    padding:0;
-    overflow:hidden;
-    position:relative;
-    box-shadow:0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,178,60,0.15);
-  }
-  .cert-outer-border{
-    margin:10px;
-    border:1px solid rgba(255,178,60,0.3);
-    border-radius:2px;
-    padding:32px 28px 28px;
-    position:relative;
-  }
-  /* Corner ornaments */
-  .cert-outer-border::before,.cert-outer-border::after{
-    content:"";position:absolute;width:22px;height:22px;
-    border-color:var(--ember-3);border-style:solid;opacity:0.6;
-  }
-  .cert-outer-border::before{top:-1px;left:-1px;border-width:2px 0 0 2px;}
-  .cert-outer-border::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0;}
-  .cert-inner-border{
-    border:1px solid rgba(255,138,30,0.15);
-    border-radius:2px;
-    padding:28px 24px 24px;
-    position:relative;
-  }
-  .cert-inner-border::before,.cert-inner-border::after{
-    content:"";position:absolute;width:14px;height:14px;
-    border-color:rgba(255,178,60,0.4);border-style:solid;
-  }
-  .cert-inner-border::before{top:-1px;right:-1px;border-width:2px 2px 0 0;}
-  .cert-inner-border::after{bottom:-1px;left:-1px;border-width:0 0 2px 2px;}
-
-  /* Header */
-  .cert-header{text-align:center;margin-bottom:22px;}
-  .cert-logo-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:4px;}
-  .cert-logo-icon{width:28px;height:28px;color:var(--ember-2);}
-  .cert-logo-icon svg{width:100%;height:100%;}
-  .cert-org{font-family:var(--font-display);font-size:13px;letter-spacing:0.25em;color:var(--ember-3);text-transform:uppercase;}
-  .cert-divider{display:flex;align-items:center;gap:10px;margin:10px 0;}
-  .cert-divider-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(255,178,60,0.4),transparent);}
-  .cert-divider-diamond{width:6px;height:6px;background:var(--ember-3);transform:rotate(45deg);flex-shrink:0;opacity:0.7;}
-
-  /* Main title */
-  .cert-main-title{font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:0.12em;text-align:center;color:var(--text-hi);text-transform:uppercase;margin-bottom:4px;}
-  .cert-subtitle{font-family:var(--font-mono);font-size:10px;letter-spacing:0.2em;color:var(--ember-3);text-align:center;text-transform:uppercase;margin-bottom:20px;}
-
-  /* Body text */
-  .cert-body-text{text-align:center;color:var(--text-mid);font-size:13px;font-style:italic;margin-bottom:14px;line-height:1.7;}
-  .cert-recipient-name{
-    font-family:var(--font-display);font-size:30px;font-weight:600;
-    text-align:center;color:var(--ember-3);
-    margin:0 auto 4px;
-    letter-spacing:0.04em;
-    text-shadow:0 0 30px rgba(255,138,30,0.3);
-    border-bottom:1px solid rgba(255,178,60,0.3);
-    padding-bottom:8px;
-    max-width:90%;
-  }
-  .cert-completion-text{text-align:center;color:var(--text-mid);font-size:13px;margin:14px 0 6px;line-height:1.7;}
-  .cert-formation-name{font-family:var(--font-display);font-size:16px;font-weight:600;letter-spacing:0.08em;color:var(--text-hi);text-align:center;margin-bottom:4px;}
-  .cert-formation-sub{font-family:var(--font-mono);font-size:10.5px;color:var(--text-low);letter-spacing:0.1em;text-align:center;margin-bottom:20px;}
-
-  /* Footer row */
-  .cert-footer-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:18px;gap:12px;}
-  .cert-sig-block{text-align:center;flex:1;}
-  .cert-sig-line{width:100%;height:1px;background:rgba(255,255,255,0.15);margin-bottom:6px;}
-  .cert-sig-name{font-family:var(--font-display);font-size:13px;letter-spacing:0.05em;color:var(--text-hi);}
-  .cert-sig-role{font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.1em;color:var(--text-low);text-transform:uppercase;margin-top:2px;}
-
-  /* Wax seal */
-  .cert-seal{flex-shrink:0;width:72px;height:72px;position:relative;}
-  .cert-seal-svg{width:72px;height:72px;}
-
-  /* Date */
-  .cert-date-block{text-align:center;flex:1;}
-  .cert-date-val{font-family:var(--font-mono);font-size:11px;color:var(--text-mid);letter-spacing:0.06em;}
-  .cert-date-label{font-family:var(--font-mono);font-size:9px;letter-spacing:0.12em;color:var(--text-low);text-transform:uppercase;margin-top:3px;}
-
-  /* Background watermark */
-  .cert-watermark{
-    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    opacity:0.03;pointer-events:none;
-    width:220px;height:220px;color:var(--ember-2);
-  }
-  .cert-watermark svg{width:100%;height:100%;}
-
-  @media(max-width:520px){
-    .cert-main-title{font-size:20px;}
-    .cert-recipient-name{font-size:22px;}
-    .cert-outer-border{padding:20px 16px 18px;}
-    .cert-inner-border{padding:18px 14px 16px;}
-  }
-
+  /* ---------- MODULE COMPLETE ---------- */
   .complete-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;}
   .complete-card{max-width:420px;width:100%;text-align:center;background:var(--bg-panel);border:1px solid var(--line);border-radius:18px;padding:40px 30px;}
   .complete-icon{width:46px;height:46px;margin:0 auto 16px;color:var(--ember-2);}
@@ -325,6 +221,7 @@
     .gate-card{padding:32px 22px 28px;}
   }
 
+
   /* ── FOND ANIMÉ ────────────────────────────────────────── */
   #gameBg {
     position: fixed;
@@ -334,13 +231,12 @@
     pointer-events: none;
   }
   #app { position: relative; z-index: 1; }
-
   .disclaimer-banner {
     background: rgba(11,9,6,0.7);
     border-top: 1px solid rgba(255,178,60,0.15);
     padding: 12px 20px;
     text-align: center;
-    font-family: var(--font-mono);
+    font-family: var(--font-mono, monospace);
     font-size: 10px;
     color: var(--text-low);
     line-height: 1.6;
@@ -353,14 +249,10 @@
 <body>
 <canvas id="gameBg" aria-hidden="true"></canvas>
 <div id="app"></div>
-<div class="disclaimer-banner" id="gameDisclaimer" style="position:relative;z-index:2;">Cette formation est fournie à titre éducatif uniquement et ne constitue pas un conseil financier ni une recommandation d’investissement. Le trading comporte des risques significatifs de perte en capital. Tradez uniquement avec des fonds que vous pouvez vous permettre de perdre.</div>
-<noscript>
-  <div style="background:#1a0d04;color:#ffc24b;padding:24px;text-align:center;font-family:sans-serif;">
-    Ce jeu a besoin que JavaScript soit activé dans ton navigateur pour fonctionner.<br>
-    Active JavaScript, ou essaie de l'ouvrir avec Chrome, Safari ou Firefox.
-  </div>
-</noscript>
+<div style="background:rgba(11,9,6,0.7);border-top:1px solid rgba(255,178,60,0.15);padding:12px 20px;text-align:center;font-size:10px;color:#8a7a6a;line-height:1.6;max-width:640px;margin:0 auto;">Cette formation est fournie à titre éducatif uniquement et ne constitue pas un conseil financier. Le trading comporte des risques significatifs de perte en capital.</div>
+<div class="disclaimer-banner">Cette formation est fournie à titre éducatif uniquement et ne constitue pas un conseil financier ni une recommandation d&#39;investissement. Le trading comporte des risques significatifs de perte en capital. Tradez uniquement avec des fonds que vous pouvez vous permettre de perdre.</div>
 <script>
+
 /* EMBER TRADING - ACADEMIE INTERACTIVE - v1 */
 function hashCode(str){
   str = String(str).toUpperCase().replace(/[^A-Z0-9]/g, "");
@@ -441,6 +333,11 @@ MODULE_CONTENT[1] = {
       type:"text",
       heading:"Les types d'ordres : comment entrer sur le marché",
       body:"Un ordre, c'est l'instruction que tu donnes au broker pour acheter ou vendre. Il existe plusieurs types, et bien les comprendre t'évite des erreurs coûteuses.\n\nOrdre au marché (Market Order) : tu achètes ou vends immédiatement, au prix actuel du marché. C'est le plus simple et le plus utilisé pour les entrées rapides.\n\nOrdre Limite (Limit Order) : tu places un ordre qui s'exécutera seulement si le prix atteint un niveau précis, plus avantageux que le prix actuel. Buy Limit : achète si le prix descend à un niveau X. Sell Limit : vend si le prix monte à un niveau X.\n\nOrdre Stop (Stop Order) : l'inverse du Limit. Il s'exécute si le prix atteint un niveau moins avantageux, généralement pour suivre une cassure. Buy Stop : achète si le prix monte au-dessus d'un niveau (cassure haussière). Sell Stop : vend si le prix descend sous un niveau (cassure baissière).\n\nStop Loss (SL) : le niveau auquel ta position se ferme automatiquement pour limiter ta perte. OBLIGATOIRE sur chaque trade, sans exception.\n\nTake Profit (TP) : le niveau auquel ta position se ferme automatiquement pour sécuriser ton profit. Optionnel, tu peux aussi fermer manuellement."
+    },
+    {
+      type:"text",
+      heading:"Pip, Lot et Spread : les 3 unités de base du trading",
+      body:"Avant de placer votre premier trade, maîtriser ces 3 notions est essentiel.\n\n▸ LE PIP\nPlus petite unité de mouvement. Sur XAUUSD, 1 pip = 0.01$. Un move de 2 000$ à 2 001$ = 100 pips.\n\n▸ LE LOT\nTaille de votre position. Sur XAUUSD :\n0.01 lot = ~1$/pip. 0.1 lot = ~10$/pip. Plus le lot est grand, plus les gains ET pertes sont amplifiés.\n\n▸ LE SPREAD\nDifférence entre prix d'achat (ask) et de vente (bid). C'est le coût de chaque trade. Un bon broker ECN = 0.1 à 0.3 pip sur l'or.\n\nMaîtrisez ces 3 éléments avant de placer votre 1er trade."
     },
     {
       type:"candleDiagram",
@@ -673,52 +570,28 @@ function renderGate(){
           '<button type="button" id="unlockBtn" class="btn btn-primary">Déverrouiller</button>' +
         '</div>' +
         '<p id="gateError" class="gate-error" hidden>Code invalide. Vérifie l\u2019orthographe ou contacte le support.</p>' +
-        '<p class="gate-footer">Pas encore de code ? <a href="mailto:samdamours@outlook.com">Contactez-nous</a></p>' +
-        '<div class="gate-social">' +
-          '<a href="https://t.me/Yashysako" target="_blank" rel="noopener" class="gate-social-btn" title="Telegram">' +
-            '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>' +
-          '</a>' +
-          '<a href="mailto:samdamours@outlook.com" class="gate-social-btn" title="Email">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>' +
-          '</a>' +
-        '</div>' +
+        '<p class="gate-footer">Pas encore de code ? <a href="https://t.me/Yashysako" target="_blank" rel="noopener">Telegram</a> · <a href="mailto:samdamours@outlook.com">Email</a></p>' +
       '</div>' +
     '</div>';
 
-  var input = document.getElementById("codeInput");
-  var error = document.getElementById("gateError");
-  var card = document.getElementById("gateCard");
-  var unlockBtn = document.getElementById("unlockBtn");
-
-  function tryUnlock(){
-    var raw = input.value.replace(/[^A-Za-z0-9]/g,"").toUpperCase();
-    var h = hashCode(input.value);
-
-    if(raw === "DEV1101"){
+  document.getElementById('unlockBtn').addEventListener('click', function(){
+    var code = document.getElementById('codeInput').value.trim().toUpperCase();
+    if(code === 'DEV1101' || (window.ACCESS_HASHES && window.ACCESS_HASHES.indexOf(hashCode(code)) !== -1)){
       grantAccess();
-      progress.unlocked = [1,2,3,4,5,6,7,8];
-      progress.completed = [];
-      saveProgress();
-      setScreen("dashboard");
-      return;
-    }
-
-    if(ACCESS_HASHES.indexOf(h) !== -1){
-      grantAccess();
-      setScreen("dashboard");
+      if(code === 'DEV1101'){
+        try{ localStorage.setItem('emberDev','true'); }catch(e){}
+        /* DEV: déverrouiller tous les modules */
+        progress.unlocked = [1,2,3,4,5,6,7,8];
+        saveProgress();
+      }
+      setScreen('dashboard');
     } else {
-      error.hidden = false;
-      card.classList.add("shake");
-      setTimeout(function(){ card.classList.remove("shake"); }, 400);
+      var err = document.getElementById('gateError');
+      if(err) err.hidden = false;
     }
-  }
-
-  unlockBtn.addEventListener("click", tryUnlock);
-  input.addEventListener("keydown", function(e){
-    if(e.key === "Enter" || e.keyCode === 13){
-      e.preventDefault();
-      tryUnlock();
-    }
+  });
+  document.getElementById('codeInput').addEventListener('keydown', function(e){
+    if(e.key === 'Enter') document.getElementById('unlockBtn').click();
   });
 }
 
@@ -763,6 +636,7 @@ function renderDashboard(){
       '<div class="dash-footer">' +
         '<div class="dash-tagline">Short Step. Long Vision.</div>' +
         '<button class="dash-reset" id="resetBtn">Réinitialiser la progression</button>' +
+        '<button class="dash-logout" id="logoutBtn">← Retour à la page d’accès</button>' +
       '</div>' +
     '</div>';
 
@@ -772,12 +646,26 @@ function renderDashboard(){
       enterModule(parseInt(this.getAttribute("data-id"), 10));
     });
   }
+  document.getElementById("logoutBtn").addEventListener("click", function(){
+    setScreen("gate");
+  });
   document.getElementById("resetBtn").addEventListener("click", function(){
-    if(confirm("Réinitialiser toute la progression dans l\u2019Académie ? Cette action est irréversible.")){
-      progress = defaultProgress();
-      saveProgress();
-      render();
+    var btn = this;
+    if(btn.getAttribute("data-c") !== "1"){
+      btn.textContent = "Appuyer à nouveau pour confirmer";
+      btn.setAttribute("data-c","1");
+      btn.style.color = "var(--bad)";
+      setTimeout(function(){
+        btn.textContent = "Réinitialiser la progression";
+        btn.removeAttribute("data-c");
+        btn.style.color = "";
+      }, 3000);
+      return;
     }
+    progress = defaultProgress();
+    try{ if(localStorage.getItem("emberDev")==="true"){ progress.unlocked=[1,2,3,4,5,6,7,8]; } }catch(e){}
+    saveProgress();
+    render();
   });
 }
 
@@ -1384,6 +1272,7 @@ MODULE_CONTENT[4] = {
     {type:"text",heading:"La méthode top-down : toujours commencer par le grand tableau",body:"La règle la plus importante : commence toujours par le timeframe le plus élevé et descends progressivement.\n\nÉtape 1 — H4 : Identifie la tendance principale. Trace les grandes lignes de tendance. Repère les zones de liquidité importantes.\n\nÉtape 2 — H1 : Affine ton analyse. Marque les niveaux clés récents. Confirme que la tendance H4 est intacte.\n\nÉtape 3 — M15/M5 : Cherche ton entrée. Ne trade que dans le sens de la tendance H4.\n\nPourquoi ? Tu évites 80% des trades perdants qui vont contre la tendance. Et tu places stops et cibles sur des niveaux logiques."},
     {type:"text",heading:"La méthode d'identification de tendance Sam",body:"Voici ma technique personnelle utilisée quotidiennement sur XAUUSD.\n\nAprès une hausse importante : le prix fait souvent une accumulation à la baisse (consolidation calme, petites bougies, sans gros volume). Ce n'est pas un retournement, c'est une pause. Dans ~80% des cas, cette accumulation est suivie d'une nouvelle cassure haussière.\n\nAprès une chute importante : le prix fait souvent une accumulation à la hausse (pullback calme). Et dans ~80% des cas, cette accumulation est suivie d'une nouvelle cassure baissière.\n\nDifférencier accumulation vs retournement : accumulation = bougies petites, range serré, pas de cassure de structure majeure. Retournement = grande bougie impulsive, cassure franche d'un swing clé, volume élevé."},
     {type:"text",heading:"Identifier précisément un swing high et un swing low",body:"En pratique, un swing high se confirme par 3 bougies minimum : la bougie centrale a un high plus élevé que la bougie qui la précède ET que la bougie qui la suit. C'est la définition technique précise.\n\nUn swing low fonctionne pareil mais à l'inverse : la bougie centrale a un low plus bas que ses deux voisines.\n\nEn pratique sur un graphique réel, plus tu zoomes (timeframe bas), plus tu vas trouver de petits swings sans grande importance. C'est pour ça que l'analyse de structure doit toujours se faire en gardant en tête le timeframe de référence : un swing high sur M1 n'a presque aucune importance, mais un swing high sur H4 ou Daily est un niveau de liquidité majeur que le marché va probablement revisiter.\n\nQuand un nouveau Higher High se forme après un Higher Low, la tendance haussière se confirme structure par structure. Le jour où un Lower Low apparaît à la place d'un nouveau Higher Low, c'est le premier signal d'alarme qu'un changement de structure (potentiel retournement) pourrait être en cours."},
+    {type:"text",heading:"Le Break of Structure (BOS) : la confirmation de tendance",body:"Le Break of Structure, ou BOS, est la confirmation qu'une tendance existante continue.\n\n▸ BOS HAUSSIER : le prix casse au-dessus du dernier Higher High. Les acheteurs maintiennent le contrôle.\n\n▸ BOS BAISSIER : le prix casse sous le dernier Lower Low. Les vendeurs maintiennent la pression.\n\nBOS = tendance continue. CHoCH = tendance change. Ces deux concepts travaillent ensemble."},
     {type:"text",heading:"Le changement de caractère (Change of Character)",body:"Le Change of Character, ou CHoCH, est le signal le plus précoce qu'une tendance pourrait changer de direction.\n\nDans une tendance haussière établie (HH/HL), un CHoCH se produit quand le prix casse sous le dernier Higher Low. Cette cassure brise la structure haussière et signale que les vendeurs ont potentiellement repris le contrôle.\n\nDans une tendance baissière établie (LH/LL), un CHoCH se produit quand le prix casse au-dessus du dernier Lower High.\n\nImportant : un CHoCH n'est pas une garantie de retournement complet. C'est un signal d'alerte qui te dit de réduire ton biais directionnel précédent et de chercher une confirmation supplémentaire (nouvelle structure HH/HL ou LH/LL) avant de retourner ta position complètement. Beaucoup de traders combinent le CHoCH avec les zones de liquidité et les Order Blocks pour confirmer un vrai retournement plutôt qu'un simple pullback."}
   ],
   quiz:[
@@ -1449,7 +1338,7 @@ MODULE_CONTENT[6] = {
     {q:"L'avantage mathématique de risquer 1% maximum par trade est :",options:["Tu doubles plus vite","Il te faudrait ~100 pertes consécutives pour vider le compte","Les courtiers donnent de meilleurs spreads","Tu as moins besoin d'analyser"],correct:1,explain:"1% par trade = survie garantie. Une série de 10 pertes ne coûte que ~9.5%. Tu peux analyser et corriger."}
   ],
   exercise:{steps:[
-    {kind:"calc-input",instruction:"Calcule la taille de position. Compte : 10 000$. Risque : 1%. Stop-loss : 30 pips. Sur XAUUSD, 0.01 lot = 1$/pip (pip = le plus petit mouvement de prix, lot = la taille de ta position). Quel est le nombre de lots maximum ? (Arrondir vers le bas)",given:[{label:"Étape 1 — Capital",value:"10 000 $"},{label:"Étape 2 — Risque max (1%)",value:"10 000 × 1% = 100 $"},{label:"Étape 3 — Stop-loss",value:"30 pips"},{label:"Étape 4 — Valeur d'1 pip",value:"1 $/pip avec 0.01 lot"},{label:"Formule finale",value:"100 $ ÷ 30 pips = 3.33 → arrondi = 0.03 lot"}],correctAnswer:0.03,tolerance:0.005,unit:"lot",successText:"Bravo ! 100$ (ton risque max) ÷ 30 pips (ton stop) = 3.33. On arrondit vers le bas = 3 unités de 0.01 lot = 0.03 lot. Risque réel : 30 pips × 1$ × 3 = 90$. Juste sous 100$, c'est parfait.",hint:"Ton risque max = 100$. 1 pip vaut 1$ avec 0.01 lot. Donc : 100 ÷ 30 = 3.33 → prends 3 unités de 0.01 lot"},
+    {kind:"calc-input",instruction:"Calcule la taille de position. Compte : 10 000$. Risque : 1%. Stop-loss : 30 pips. Sur XAUUSD, 0.01 lot = 1$/pip (pip = le plus petit mouvement de prix, lot = la taille de ta position). Quel est le nombre de lots maximum ? (Arrondir vers le bas)",given:[{label:"Étape 1 — Capital",value:"10 000 $"},{label:"Étape 2 — Risque max (1%)",value:"10 000 × 1% = 100 $"},{label:"Étape 3 — Stop-loss",value:"30 pips"},{label:"Étape 4 — Valeur d'1 pip",value:"1 $/pip avec 0.01 lot"},{label:"Formule à appliquer",value:"Risque max ÷ (Stop-loss en pips) = ? lots"}],correctAnswer:0.03,tolerance:0.005,unit:"lot",successText:"Bravo ! 100$ (ton risque max) ÷ 30 pips (ton stop) = 3.33. On arrondit vers le bas = 3 unités de 0.01 lot = 0.03 lot. Risque réel : 30 pips × 1$ × 3 = 90$. Juste sous 100$, c'est parfait.",hint:"Ton risque max = 100$. 1 pip vaut 1$ avec 0.01 lot. Donc : 100 ÷ 30 = 3.33 → prends 3 unités de 0.01 lot"},
     {kind:"choice",instruction:"Tu prends un trade, il part bien. Tu es à +2R de profit. (R = ton Risque initial. Si tu as risqué 100$, +2R = +200$ de profit — tu as fait 2 fois ce que tu avais risqué.) Quelle est la bonne pratique ?",options:["Laisser courir sans stop, la tendance est forte","Fermer immédiatement les 100% pour sécuriser le profit","Déplacer le stop à break-even (ton prix d'entrée = plus aucun risque) et fermer la moitié de la position, laisser l'autre moitié courir","Doubler la taille puisque ça va bien"],correctIndex:2,successText:"La gestion professionnelle : tu fermes 50% à +2R pour sécuriser du profit réel, tu déplaces ton stop à break-even (prix d'entrée) donc la moitié restante ne risque plus rien, et tu laisses courir pour profiter si le mouvement continue. Le meilleur des deux mondes.",hintText:"Tu ne veux ni tout perdre (laisser courir sans protection) ni fermer trop tôt. La solution = prendre la moitié des profits et protéger le reste."},
     {kind:"choice",instruction:"Tu as perdu 3 trades aujourd'hui pour -2.8% du compte. Il reste 2 heures de session NY. Que fais-tu ?",options:["Je continue normalement, c'est encore une bonne session","Je prends un dernier trade de grande taille pour récupérer","J'arrête pour aujourd'hui — règle : 3 pertes ou -2% max par jour → pause 24h obligatoire","Je passe à un autre actif"],correctIndex:2,successText:"Après 3 pertes ou -2% par jour, la règle est d'arrêter. Ton état mental est compromis. Les pires erreurs se font dans cet état.",hintText:"La règle de 3 pertes max ou -2% par jour existe précisément pour les jours où tout va mal."}
   ]}
@@ -1517,11 +1406,7 @@ MODULE_CONTENT[8] = {
 };
 
 /* ---------- INIT ---------- */
-if(hasAccess()){
-  nav.screen = "dashboard";
-} else {
-  nav.screen = "gate";
-}
+nav.screen = "gate";
 render();
 
 
@@ -1604,6 +1489,7 @@ render();
   }
   draw();
 })();
+
 
 </script>
 </body>
